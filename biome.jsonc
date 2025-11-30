@@ -1,0 +1,65 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite/core", "ultracite/react"],
+  "files": {
+    "includes": ["**/*", "!dist", "!.next", "vite.config.ts"]
+  },
+  "linter": {
+    "rules": {
+      "a11y": {
+        "noSvgWithoutTitle": "off"
+      },
+      "correctness": {
+        "useImageSize": "off"
+      },
+      "nursery": {
+        "noIncrementDecrement": "off"
+      },
+      "style": {
+        "useConsistentTypeDefinitions": {
+          "level": "warn",
+          "options": {
+            "style": "interface"
+          }
+        },
+        "noMagicNumbers": "off",
+        "noExportedImports": "off",
+        "noEnum": "off",
+        "noRestrictedImports": {
+          "options": {
+            "patterns": [
+              {
+                "group": ["../*"],
+                "message": "Relative imports are not allowed"
+              }
+            ]
+          },
+          "level": "error"
+        }
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "useEditorconfig": true,
+    "formatWithErrors": true,
+    "lineWidth": 120,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "javascript": {
+    "formatter": {
+      "bracketSpacing": true
+    }
+  },
+  "json": {
+    "parser": {
+      "allowComments": true
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
+}
