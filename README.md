@@ -19,18 +19,38 @@ This Turborepo includes the following packages/apps:
 - `docs`: a [Next.js](https://nextjs.org/) app
 - `web`: another [Next.js](https://nextjs.org/) app
 - `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
 - `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+
+### Prisma setup
+
+Prisma was initialized with followig commands:
+
+```bash
+bun add @prisma/client prismabox --cwd ./apps/api
+bun add -d prisma --cwd ./apps/api
+cd apps/api
+bunx --bun prisma init --datasource-provider postgresql
+```
+
+### BetterAuth
+
+One time setup
+
+> No need to do anything. This is just for reference for future projects.
+
+```bash
+cd apps/api
+bunx @better-auth/cli@latest generate --config src/modules/auth/auth.ts
+```
 
 ### Utilities
 
 This Turborepo has some additional tools already setup for you:
 
 - [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- [Biome](https://biomejs.dev/) + [Ultrcite](https://www.ultracite.ai/?ref=producthunt) for code linting
 
 ### Build
 
