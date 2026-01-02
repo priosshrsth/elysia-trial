@@ -1,5 +1,6 @@
 [tools]
 bun = "latest"
+node = "24"
 
 [tasks.cleanup]
 description = "Cleanup node_modules, build outputs and lockfiles"

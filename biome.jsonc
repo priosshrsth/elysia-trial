@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite/core", "ultracite/react"],
+  "extends": ["ultracite/core", "ultracite/react", "ultracite/next"],
   "files": {
     "includes": ["**/*", "!dist", "!.next", "vite.config.ts"]
   },
@@ -23,6 +23,7 @@
           }
         },
         "noMagicNumbers": "off",
+        "noProcessEnv": "error",
         "noExportedImports": "off",
         "noEnum": "off",
         "noRestrictedImports": {
@@ -49,7 +50,8 @@
   },
   "javascript": {
     "formatter": {
-      "bracketSpacing": true
+      "bracketSpacing": true,
+      "indentWidth": 2
     }
   },
   "json": {
