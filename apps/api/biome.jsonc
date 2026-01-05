@@ -1,0 +1,18 @@
+{
+  "$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
+  "root": false,
+  "extends": ["./../../biome.jsonc"],
+  "overrides": [
+    {
+      "includes": ["./src/config/**/*"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noProcessEnv": "off",
+            "noNonNullAssertion": "off"
+          }
+        }
+      }
+    }
+  ]
+}
