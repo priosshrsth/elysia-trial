@@ -1,8 +1,8 @@
 import Elysia from "elysia";
 import { auth } from "./auth";
 
-export const authPlugin = new Elysia()
-  .mount(auth.handler)
+export const authApp = new Elysia()
+  .mount("/api", auth.handler)
   .macro({
     auth: {
       async resolve({ status, request: { headers } }) {

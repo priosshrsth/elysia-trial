@@ -1,5 +1,5 @@
+import { appConfig } from "@api/config/app.config";
 import { defineConfig } from "drizzle-kit";
-import { appConfig } from "src/config/app.config";
 
 export const drizzleConfig = defineConfig({
   out: "./drizzle",

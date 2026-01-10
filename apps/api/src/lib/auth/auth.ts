@@ -1,9 +1,9 @@
+import { appConfig } from "@api/config/app.config";
+import { db } from "@api/db";
+import { redis } from "@api/lib/redis";
+import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { betterAuth } from "better-auth/minimal";
 import { openAPI } from "better-auth/plugins";
-import { appConfig } from "src/config/app.config";
-import { db } from "src/db";
-import { redis } from "src/lib/redis";
 
 export const auth = betterAuth({
   secret: appConfig.AUTH_SECRET,
@@ -11,6 +11,7 @@ export const auth = betterAuth({
     provider: "pg",
     debugLogs: true,
   }),
+  logger: { level: "error" },
   disabledPaths: ["/account-info"],
   emailVerification: {
     autoSignInAfterVerification: true,
@@ -20,7 +21,7 @@ export const auth = betterAuth({
       //   subject: "Verify your email address",
       //   text: `Click the link to verify your email: ${url}`,
       // });
-      console.log(data);
+      // console.log(data);
       return Promise.resolve();
     },
     sendOnSignUp: true,
@@ -82,11 +83,11 @@ export const auth = betterAuth({
     },
   },
 
-  basePath: "/api/auth",
+  basePath: "/auth",
   plugins: [openAPI()],
   telemetry: {
-    enabled: true,
-    debug: true,
+    enabled: false,
+    debug: false,
   },
   user: {
     deleteUser: {

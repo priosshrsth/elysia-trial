@@ -1,9 +1,9 @@
-import openapi, { fromTypes } from "@elysiajs/openapi";
-import { appConfig } from "src/config/app.config";
-import { AuthOpenApi } from "../auth/auth.openapi";
+import { appConfig } from "@api/config/app.config";
+import { AuthOpenApi } from "@api/lib/auth/auth.openapi";
+import { fromTypes, openapi } from "@elysiajs/openapi";
 
 export const openApiPlugin = openapi({
-  references: fromTypes(appConfig.NODE_ENV === "production" ? "dist/index.d.ts" : "src/index.ts"),
+  references: fromTypes(appConfig.NODE_ENV === "production" ? "dist/index.d.ts" : "@api/index.ts"),
   documentation: {
     components: await AuthOpenApi.componets,
     paths: await AuthOpenApi.getPaths(),
