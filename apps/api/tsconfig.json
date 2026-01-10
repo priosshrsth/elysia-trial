@@ -1,18 +1,15 @@
 {
+  "extends": "@repo/ts-config/apps.json",
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
     "strict": true,
     "skipLibCheck": true,
     "baseUrl": ".",
-    "paths": {
-      "types/*": ["../../packages/types/src/*"],
-      "src/*": ["./src/*"]
-    },
     "strictNullChecks": true
   }
 }

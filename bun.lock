@@ -17,9 +17,9 @@
       "version": "1.0.50",
       "dependencies": {
         "@elysiajs/static": "^1.4.7",
+        "@repo/types": "workspace:*",
         "drizzle-orm": "^0.45.1",
         "elysia": "^1.4.21",
-        "types": "workspace:*",
         "zod": "catalog:lib",
       },
       "devDependencies": {
@@ -71,7 +71,7 @@
       "version": "0.0.0",
     },
     "packages/types": {
-      "name": "types",
+      "name": "@repo/types",
       "version": "1.0.0",
       "dependencies": {
         "zod": "catalog:lib",
@@ -296,6 +296,8 @@
 
     "@repo/ts-config": ["@repo/ts-config@workspace:packages/ts-config"],
 
+    "@repo/types": ["@repo/types@workspace:packages/types"],
+
     "@repo/ui": ["@repo/ui@workspace:packages/ui"],
 
     "@sinclair/typebox": ["@sinclair/typebox@0.34.41", "", {}, "sha512-6gS8pZzSXdyRHTIqoqSVknxolr1kzfy4/CeDnrzsVz8TTIWUbOBr6gnzOmTYJ3eXQNh4IYHIGi5aIL7sOZ2G/g=="],
@@ -499,8 +501,6 @@
     "turbo-windows-64": ["turbo-windows-64@2.7.2", "", { "os": "win32", "cpu": "x64" }, "sha512-rPjqQXVnI6A6oxgzNEE8DNb6Vdj2Wwyhfv3oDc+YM3U9P7CAcBIlKv/868mKl4vsBtz4ouWpTQNXG8vljgJO+w=="],
 
     "turbo-windows-arm64": ["turbo-windows-arm64@2.7.2", "", { "os": "win32", "cpu": "arm64" }, "sha512-tcnHvBhO515OheIFWdxA+qUvZzNqqcHbLVFc1+n+TJ1rrp8prYicQtbtmsiKgMvr/54jb9jOabU62URAobnB7g=="],
-
-    "types": ["types@workspace:packages/types"],
 
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 

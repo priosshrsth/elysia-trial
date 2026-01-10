@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@elysiajs/static": "^1.4.7",
-    "types": "workspace:*",
+    "@repo/types": "workspace:*",
     "drizzle-orm": "^0.45.1",
     "elysia": "^1.4.21",
     "zod": "catalog:lib"

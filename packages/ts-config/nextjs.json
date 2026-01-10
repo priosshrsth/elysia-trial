@@ -1,17 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "./base.json",
+  "extends": "./apps.json",
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "allowJs": true,
-    "jsx": "preserve",
-    "noEmit": true,
-    "paths": {
-      "src/*": ["./src/*"],
-      "@ui/*": ["../../packages/ui/src/*"],
-      "@repo/ui/*": ["../../packages/ui/src/*"]
-    }
+    "jsx": "react-jsx",
+    "noEmit": true
   }
 }

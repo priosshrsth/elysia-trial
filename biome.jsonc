@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite/core", "ultracite/react", "ultracite/next"],
+  "extends": ["ultracite/core"],
   "files": {
     "includes": ["**/*", "!dist", "!.next", "vite.config.ts"]
   },
@@ -34,13 +34,20 @@
                 "message": "Relative imports are not allowed"
               },
               {
-                "group": ["api/*"],
-                "message": "Please refrain from importing from api."
+                "group": ["types/*"],
+                "message": "Refraing from importing from types"
+              },
+              {
+                "group": ["ui/*"],
+                "message": "Refraing from importing from ui"
               }
             ]
           },
           "level": "error"
         }
+      },
+      "performance": {
+        "noBarrelFile": "error"
       }
     }
   },

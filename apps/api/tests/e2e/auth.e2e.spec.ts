@@ -1,37 +1,24 @@
-import { app } from "src/app";
+import { treaty } from "@elysiajs/eden";
+import { app } from "src/main";
 
 describe("Better Auth Integration", () => {
+  const client = treaty(app);
   it("Scenario 1: Register a new user fails with invalid data", async () => {
-    const response = await app.handle(
-      new Request("http://localhost:3001/api/auth/sign-up/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({}),
-      }),
-    );
+    const response = await client.register.post({
+      email: "",
+      password: "",
+      name: "",
+    });
 
-    const data = await response.json();
-    data.expect(response.status).toBe(400);
+    expect(response.status).toBe(400);
   });
 
   it("Scenario 1: Register a new user", async () => {
-    const response = await app.handle(
-      new Request("http://localhost:3001/api/auth/sign-up/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          email: "john@example.com",
-          name: "John Doe",
-          password: "Secret@123",
-        }),
-      }),
-    );
+    const response = await client.register.post({
+      email: "john@example.com",
+      password: "Secret@123",
+      name: "John Doe",
+    });
     expect(response.status).toBe(200);
   });
 });
