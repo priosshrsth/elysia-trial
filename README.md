@@ -1,34 +1,116 @@
-# Turborepo starter
+# Turborepo – Bun‑First Full‑Stack Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+This repository is a **Turborepo-based monorepo** built with a **Bun-first mindset**.  
+It contains frontend applications, shared packages, and a backend API powered by **Elysia.js**.
 
-## Using this example
+The purpose of this repo is to provide a **clean, explicit, and type-safe foundation** for modern full‑stack development—without Node.js compatibility layers.
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
+## Repository Structure
+
+```
+apps/
+  api/        → Backend API (Elysia + Bun)
+  web/        → Next.js frontend
+  docs/       → Documentation site (Next.js)
+
+packages/
+  ui/         → Shared UI components
+  typescript-config/ → Shared TypeScript configs
 ```
 
-## What's inside?
+All apps and packages are written in **TypeScript** and share common linting and formatting rules.
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+## Runtime & Package Management
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-- [**`api`]("./apps/api/README.md")**: Apis created with Elysia.js
+- **Runtime**: Bun
+- **Package manager**: Bun
+- **Task runner / orchestration**: Turborepo
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+This repository intentionally:
+- Uses **Bun instead of Node.js**
+- Uses **Bun instead of pnpm / npm / yarn**
+- Avoids Node compatibility adapters unless strictly required
 
-### Utilities
+---
 
-This Turborepo has some additional tools already setup for you:
+## Backend API
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [Biome](https://biomejs.dev/) + [Ultrcite](https://www.ultracite.ai/?ref=producthunt) for code linting
+The backend lives in:
 
+```
+apps/api
+```
 
+It is built with:
+- **Elysia.js**
+- **Bun runtime**
+- **Drizzle ORM**
+- **PostgreSQL (Bun native adapter)**
+- **Redis / Dragonfly for sessions**
+
+📘 **API documentation & architecture details**  
+→ See [`apps/api/README.md`](./apps/api/README.md)
+
+---
+
+## Turborepo & Monorepo Docs
+
+This repository uses Turborepo for:
+- Task orchestration
+- Build caching
+- Dependency graph optimization
+
+📘 **Turborepo-specific documentation**  
+→ See [`./turbo-repo.md`](./turbo-repo.md)
+
+---
+
+## Development Philosophy
+
+These principles apply across the entire monorepo:
+
+- Explicit over implicit
+- Bun-native over compatibility layers
+- Schemas over assumptions
+- Modules over monoliths
+- Tests alongside production code
+
+Project-specific rules (API schemas, response policies, testing strategy, etc.) are documented **inside each app/package** to avoid duplication.
+
+---
+
+## Getting Started
+
+Install dependencies:
+
+```bash
+bun install
+```
+
+Run all apps in development mode:
+
+```bash
+bun run dev
+```
+
+---
+
+## Where to Look Next
+
+- 📘 **API design, auth, schemas, testing**  
+  → `apps/api/README.md`
+
+- 📘 **Monorepo & Turborepo details**  
+  → `turbo-repo.md`
+
+- 📘 **Frontend & UI docs**  
+  → `apps/web` and `packages/ui`
+
+---
+
+This root README is intentionally **high‑level**.  
+Detailed, app‑specific documentation lives close to the code it describes.
