@@ -16,7 +16,7 @@ export const user = pgTable(
     emailVerifiedAt: timestampField,
     image: text(),
   },
-  // (table) => [check("userName", sql`char_length(${table.userName}) >= 6`)],
+  (table) => [check("userName", sql`char_length(${table.userName}) >= 6`)],
 );
 
 export const account = pgTable(

@@ -19,7 +19,8 @@ CREATE TABLE "user" (
 	"email" text NOT NULL,
 	"userName" text,
 	"image" text,
-	CONSTRAINT "user_email_unique" UNIQUE("email")
+	CONSTRAINT "user_email_unique" UNIQUE("email"),
+	CONSTRAINT "userName" CHECK (char_length("user"."userName") >= 6)
 );
 --> statement-breakpoint
 CREATE TABLE "verification" (

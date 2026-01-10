@@ -1,5 +1,5 @@
 {
-  "id": "4ba4f7cd-36aa-4afb-9a97-5b1c34200cbb",
+  "id": "91e2fd02-82e7-4ce3-8f79-c8035689eaec",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -157,7 +157,12 @@
         }
       },
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "userName": {
+          "name": "userName",
+          "value": "char_length(\"user\".\"userName\") >= 6"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.verification": {
