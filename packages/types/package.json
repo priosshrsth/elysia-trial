@@ -2,7 +2,7 @@
   "name": "@repo/types",
   "version": "1.0.0",
   "scripts": {
-    "check-types": "tsc"
+    "check-types": "tsc --noemit"
   },
   "private": "true",
   "dependencies": {
