@@ -5,6 +5,7 @@
     "declarationMap": true,
     "esModuleInterop": true,
     "incremental": false,
+    "moduleResolution": "bundler",
     "isolatedModules": true,
     "lib": ["es2022", "DOM", "DOM.Iterable"],
     "moduleDetection": "force",
