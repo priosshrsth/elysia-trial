@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { boolean, check, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { check, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { commonAttributes } from "src/db/utils/common-attributes";
 import { timestampField } from "src/db/utils/timestamp-field";
 
