@@ -1,27 +1,22 @@
 import { relations, sql } from "drizzle-orm";
-import { check, index, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { check, index, pgEnum, pgTable, text } from "drizzle-orm/pg-core";
 import { commonAttributes } from "src/db/utils/common-attributes";
 import { timestampField } from "src/db/utils/timestamp-field";
 import { VerificationType } from "types/modules/auth/const/auth.const";
 
-export const VerificationActionEnum = pgEnum("verification_action", VerificationType);
+export const VerificationActionTypeEnum = pgEnum("verification_action_type", VerificationType);
 
 export const user = pgTable(
   "user",
   {
-    id: text().primaryKey(),
+    ...commonAttributes,
     name: text().notNull(),
     email: text().notNull().unique(),
     userName: text(),
     emailVerifiedAt: timestampField,
     image: text(),
-    createdAt: timestampField.defaultNow().notNull(),
-    updatedAt: timestampField
-      .defaultNow()
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .notNull(),
   },
-  (table) => [check("userName", sql`char_length(${table.userName}) >= 6`)],
+  // (table) => [check("userName", sql`char_length(${table.userName}) >= 6`)],
 );
 
 export const account = pgTable(
@@ -51,16 +46,23 @@ export const verification = pgTable(
     userId: text()
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    action: text(),
+    type: VerificationActionTypeEnum(),
     token: text().notNull(),
-    expiresAt: timestamp("expires_at").notNull(),
+    expiresAt: timestampField.notNull(),
   },
   (table) => [index().on(table.userId)],
 );
 
 export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
+  verifications: many(verification),
 }));
+
+export const verificationRelations = relations(verification, ({ one }) => {
+  return {
+    user: one(user),
+  };
+});
 
 export const accountRelations = relations(account, ({ one }) => ({
   user: one(user),

@@ -4,8 +4,8 @@
   "scripts": {
     "test": "bun test",
     "dev": "bun run --watch src/main.ts",
-    "generate": "bun --bun drizzle-kit generate",
-    "migrate": "bun --bun drizzle-kit migrate",
+    "generate": "bun --bun run drizzle-kit generate --config=drizzle.config.ts",
+    "migrate": "bun --bun ./node_modules/drizzle-kit/utils.js migrate",
     "build": "bun --bun build src/main.ts",
     "start": "bun --bun run dist/main.js"
   },
@@ -23,6 +23,5 @@
     "bun-types": "^catalog:core",
     "drizzle-kit": "^0.31.8",
     "typescript": "^catalog:core"
-  },
-  "types": ""
+  }
 }
