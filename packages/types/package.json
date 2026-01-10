@@ -1,12 +1,12 @@
 {
-  "name": "@repo/types",
+  "name": "types",
   "version": "1.0.0",
   "scripts": {
     "check-types": "tsc"
   },
   "private": "true",
   "exports": {
-    "./*": "./src/*.*"
+    "./*": "./src/*"
   },
   "dependencies": {
     "zod": "catalog:lib"

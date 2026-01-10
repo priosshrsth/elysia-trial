@@ -1,7 +1,10 @@
 import { relations, sql } from "drizzle-orm";
-import { check, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { check, index, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { commonAttributes } from "src/db/utils/common-attributes";
 import { timestampField } from "src/db/utils/timestamp-field";
+import { VerificationType } from "types/modules/auth/const/auth.const";
+
+export const VerificationActionEnum = pgEnum("verification_action", VerificationType);
 
 export const user = pgTable(
   "user",
