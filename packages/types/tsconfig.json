@@ -14,7 +14,7 @@
     "strict": true,
     "strictNullChecks": true,
     "paths": {
-      "types/*": ["./src/*"]
+      "@repo/types/*": ["./src/*"]
     }
   },
   "include": ["src"],
