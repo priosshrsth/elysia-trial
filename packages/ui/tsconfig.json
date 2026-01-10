@@ -2,6 +2,7 @@
   "extends": "@repo/ts-config/base.json",
   "compilerOptions": {
     "outDir": "dist",
+    "jsx": "react-jsx",
     "strictNullChecks": true,
     "paths": {
       "@ui/*": ["./src/*"]
