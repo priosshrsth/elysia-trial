@@ -17,7 +17,7 @@ apps/
 
 packages/
   ui/         → Shared UI components
-  typescript-config/ → Shared TypeScript configs
+  ts-config/ → Shared TypeScript configs
 ```
 
 All apps and packages are written in **TypeScript** and share common linting and formatting rules.

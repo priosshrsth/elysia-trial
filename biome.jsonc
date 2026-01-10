@@ -32,6 +32,10 @@
               {
                 "group": ["../*"],
                 "message": "Relative imports are not allowed"
+              },
+              {
+                "group": ["api/*"],
+                "message": "Please refrain from importing from api."
               }
             ]
           },

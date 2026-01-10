@@ -10,7 +10,7 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
+    "@repo/ts-config": "workspace:*",
     "@types/bun": "catalog:core",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",

@@ -2,9 +2,10 @@
   "extends": "@repo/ts-config/base.json",
   "compilerOptions": {
     "outDir": "dist",
+    "strict": true,
     "strictNullChecks": true,
     "paths": {
-      "@ui/*": ["./src/*"]
+      "types/*": ["./src/*"]
     }
   },
   "include": ["src"],

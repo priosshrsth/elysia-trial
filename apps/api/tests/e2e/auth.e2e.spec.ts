@@ -1,4 +1,4 @@
-import { app } from "@api/app";
+import { app } from "src/app";
 
 describe("Better Auth Integration", () => {
   it("Scenario 1: Register a new user fails with invalid data", async () => {
