@@ -1,8 +1,6 @@
-import { RegisterSchema, VerificationSchema } from "@repo/types";
+import { RegisterSchema } from "@repo/types";
 import Elysia from "elysia";
 import { db } from "src/db";
-import type { verification } from "src/db/schema";
-import z from "zod";
 
 export const RegisterRoute = new Elysia()
   .post(
