@@ -1,4 +1,4 @@
-import { fromTypes, openapi } from "@elysiajs/openapi";
+import { openapi } from "@elysiajs/openapi";
 import { Elysia, ValidationError } from "elysia";
 import { appConfig } from "src/config/app.config";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -41,7 +41,7 @@ export const app = new Elysia()
   })
   .use(
     openapi({
-      references: fromTypes(appConfig.NODE_ENV === "production" ? "dist/index.d.ts" : "src/index.ts"),
+      // references: fromTypes(appConfig.NODE_ENV === "production" ? "dist/index.d.ts" : "src/index.ts"),
       documentation: {
         info: {
           title: "API Documentation",

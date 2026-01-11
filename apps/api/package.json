@@ -4,8 +4,8 @@
   "scripts": {
     "test": "bun test",
     "dev": "bun run --watch src/main.ts",
-    "generate": "bun --bun run drizzle-kit generate",
-    "migrate": "bun --bun run drizzle-kit migrate",
+    "migration:generate": "bun --bun run drizzle-kit generate",
+    "migration:run": "bun --bun run drizzle-kit migrate",
     "build": "bun --bun build src/main.ts",
     "start": "bun --bun run dist/main.js"
   },

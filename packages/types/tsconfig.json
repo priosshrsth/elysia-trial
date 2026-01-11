@@ -13,9 +13,8 @@
     "target": "ES2022",
     "strict": true,
     "strictNullChecks": true,
-    "paths": {
-      "@repo/types/*": ["./src/*"]
-    }
+    "baseUrl": ".",
+    "paths": {}
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

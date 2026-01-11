@@ -1,5 +1,5 @@
 {
-  "id": "91e2fd02-82e7-4ce3-8f79-c8035689eaec",
+  "id": "396a7ae8-5f4e-43cb-8201-51040f3f9481",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,19 +10,20 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "externalId": {
-          "name": "externalId",
+        "external_id": {
+          "name": "external_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -33,26 +34,26 @@
           "primaryKey": false,
           "notNull": true
         },
-        "userId": {
-          "name": "userId",
-          "type": "text",
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "accessToken": {
-          "name": "accessToken",
+        "access_token": {
+          "name": "access_token",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "refreshToken": {
-          "name": "refreshToken",
+        "refresh_token": {
+          "name": "refresh_token",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "idToken": {
-          "name": "idToken",
+        "id_token": {
+          "name": "id_token",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -71,11 +72,11 @@
         }
       },
       "indexes": {
-        "account_userId_index": {
-          "name": "account_userId_index",
+        "account_user_id_index": {
+          "name": "account_user_id_index",
           "columns": [
             {
-              "expression": "userId",
+              "expression": "user_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -88,11 +89,11 @@
         }
       },
       "foreignKeys": {
-        "account_userId_user_id_fk": {
-          "name": "account_userId_user_id_fk",
+        "account_user_id_user_id_fk": {
+          "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": ["userId"],
+          "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -110,12 +111,13 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
@@ -133,8 +135,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "userName": {
-          "name": "userName",
+        "user_name": {
+          "name": "user_name",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -160,7 +162,7 @@
       "checkConstraints": {
         "userName": {
           "name": "userName",
-          "value": "char_length(\"user\".\"userName\") >= 6"
+          "value": "char_length(\"user\".\"user_name\") >= 6"
         }
       },
       "isRLSEnabled": false
@@ -171,20 +173,21 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "userId": {
-          "name": "userId",
-          "type": "text",
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -192,21 +195,21 @@
           "name": "type",
           "type": "verification_action_type",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "token": {
-          "name": "token",
-          "type": "text",
+        "code": {
+          "name": "code",
+          "type": "varchar(8)",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {
-        "verification_userId_index": {
-          "name": "verification_userId_index",
+        "verification_user_id_index": {
+          "name": "verification_user_id_index",
           "columns": [
             {
-              "expression": "userId",
+              "expression": "user_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -219,11 +222,11 @@
         }
       },
       "foreignKeys": {
-        "verification_userId_user_id_fk": {
-          "name": "verification_userId_user_id_fk",
+        "verification_user_id_user_id_fk": {
+          "name": "verification_user_id_user_id_fk",
           "tableFrom": "verification",
           "tableTo": "user",
-          "columnsFrom": ["userId"],
+          "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"

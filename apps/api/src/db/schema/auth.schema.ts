@@ -1,8 +1,8 @@
+import { VerificationType } from "@repo/types";
 import { relations, sql } from "drizzle-orm";
-import { check, index, pgEnum, pgTable, text } from "drizzle-orm/pg-core";
+import { check, index, pgEnum, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { commonAttributes } from "src/db/utils/common-attributes";
 import { timestampField } from "src/db/utils/timestamp-field";
-import { VerificationType } from "types/modules/auth/const/auth.const";
 
 export const VerificationActionTypeEnum = pgEnum("verification_action_type", VerificationType);
 
@@ -25,7 +25,7 @@ export const account = pgTable(
     ...commonAttributes,
     externalId: text().notNull(),
     provider: text().notNull(),
-    userId: text()
+    userId: uuid()
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     accessToken: text(),
@@ -43,11 +43,11 @@ export const verification = pgTable(
   "verification",
   {
     ...commonAttributes,
-    userId: text()
+    userId: uuid()
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    type: VerificationActionTypeEnum(),
-    token: text().notNull(),
+    type: VerificationActionTypeEnum().notNull(),
+    code: varchar({ length: 8 }).notNull(),
     expiresAt: timestampField.notNull(),
   },
   (table) => [index().on(table.userId)],

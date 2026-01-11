@@ -5,6 +5,7 @@ export const drizzleConfig = defineConfig({
   out: "./drizzle",
   schema: "./src/db/schema/auth.schema.ts",
   dialect: "postgresql",
+  casing: "snake_case",
   dbCredentials: {
     url: appConfig.DB_URL,
   },

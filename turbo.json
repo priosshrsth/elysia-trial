@@ -18,12 +18,6 @@
       "persistent": true
     },
     "db:push": {},
-    "test": {},
-    "gen:migration": {
-      "cache": false
-    },
-    "migrate": {
-      "cache": false
-    }
+    "test": {}
   }
 }

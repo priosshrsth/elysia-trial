@@ -33,7 +33,7 @@
       "@elysiajs/eden": "^1.4.6"
     },
     "lib": {
-      "zod": "^4.3.4"
+      "zod": "^4.3.5"
     }
   },
   "engines": {
