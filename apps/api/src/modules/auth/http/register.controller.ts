@@ -1,6 +1,7 @@
 import { RegisterSchema, VerificationSchema } from "@repo/types";
 import Elysia from "elysia";
 import { db } from "src/db";
+import type { verification } from "src/db/schema";
 import z from "zod";
 
 export const RegisterRoute = new Elysia()
@@ -22,7 +23,11 @@ export const RegisterRoute = new Elysia()
       });
     }
     return {
-      ...data,
+      id: data.id,
+      userId: data.userId,
+      code: data.code,
+      createdAt: data.createdAt.toISOString(),
+      updatedAt: data.updatedAt.toISOString(),
       expiresAt: data.expiresAt.toISOString(),
     };
   })
