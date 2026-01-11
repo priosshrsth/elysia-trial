@@ -6,34 +6,14 @@ import { AuthModule } from "./modules/auth/auth.module";
 export const app = new Elysia()
   .onError(({ error }) => {
     if (error instanceof ValidationError) {
-      console.log(error.all);
-      // try {
-      //   const errors = error.all as z.core.$ZodIssue[];
-      //   return {
-      //     message: error.message,
-      //     errors: z.treeifyError({ issues: errors } as z.core.$ZodError),
-      //   };
-      // } catch (er) {
-      //   console.log(er.message);
-      // }
-      const errors = new Map(
-        error.all.flatMap((issue) => {
-          const valueError =
-            "path" in issue ? (issue as unknown as { path: string; message: string; code: string }) : null;
-          if (valueError) {
-            return [[valueError.path, valueError.message]];
-          }
-          return [];
-        }),
-      );
-
-      const parsedError = JSON.parse(error.message);
-
-      console.log(parsedError);
-
+      const data = JSON.parse(error.message) as {
+        errors: { path: string[]; message: string }[];
+        message: string;
+      };
+      const validationErrors = new Map(data.errors.map((error) => [error.path.join("."), error.message]));
       return {
-        message: error.message,
-        errors,
+        message: data.message,
+        validationErrors: Object.fromEntries(validationErrors.entries()),
       };
     }
 

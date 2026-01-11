@@ -11,7 +11,7 @@ export const RegisterRoute = new Elysia()
     },
     {
       body: RegisterSchema,
-      response: RegisterSchema,
+      // response: RegisterSchema,
     },
   )
   .get(
