@@ -1,27 +1,27 @@
-import { openapi } from "@elysiajs/openapi";
-import { Elysia, ValidationError } from "elysia";
+import { fromTypes, openapi } from "@elysiajs/openapi";
+import { Elysia } from "elysia";
 import { appConfig } from "src/config/app.config";
 import { AuthModule } from "./modules/auth/auth.module";
 
 export const app = new Elysia()
   .onError(({ error }) => {
-    if (error instanceof ValidationError) {
-      const data = JSON.parse(error.message) as {
-        errors: { path: string[]; message: string }[];
-        message: string;
-      };
-      const validationErrors = new Map(data.errors.map((error) => [error.path.join("."), error.message]));
-      return {
-        message: data.message,
-        validationErrors: Object.fromEntries(validationErrors.entries()),
-      };
-    }
+    // if (error instanceof ValidationError) {
+    //   const data = JSON.parse(error.message) as {
+    //     errors: { path: string[]; message: string }[];
+    //     message: string;
+    //   };
+    //   const validationErrors = new Map(data.errors.map((error) => [error.path.join("."), error.message]));
+    //   return {
+    //     message: data.message,
+    //     validationErrors: Object.fromEntries(validationErrors.entries()),
+    //   };
+    // }
 
     return error;
   })
   .use(
     openapi({
-      // references: fromTypes(appConfig.NODE_ENV === "production" ? "dist/index.d.ts" : "src/index.ts"),
+      references: fromTypes(appConfig.NODE_ENV === "production" ? "dist/index.d.ts" : "src/main.ts"),
       documentation: {
         info: {
           title: "API Documentation",
