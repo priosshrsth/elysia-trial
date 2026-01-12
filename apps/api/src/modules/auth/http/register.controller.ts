@@ -2,7 +2,7 @@ import { RegisterSchema } from "@repo/types";
 import Elysia from "elysia";
 import { db } from "src/db";
 
-export const RegisterRoute = new Elysia()
+export const RegisterController = new Elysia()
   .post(
     "/register",
     ({ body, status }) => {

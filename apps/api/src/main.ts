@@ -1,9 +1,12 @@
+import { cors } from "@elysiajs/cors";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
 import { appConfig } from "src/config/app.config";
 import { AuthModule } from "./modules/auth/auth.module";
+import { TaskModule } from "./modules/task/task.module";
 
 export const app = new Elysia()
+  .use(cors())
   .onError(({ error }) => {
     // if (error instanceof ValidationError) {
     //   const data = JSON.parse(error.message) as {
@@ -33,11 +36,16 @@ export const app = new Elysia()
             name: "Auth",
             description: "Authentication related endpoints",
           },
+          {
+            name: "Tasks",
+            description: "Tasks related endpoints",
+          },
         ],
       },
     }),
   )
   .use(AuthModule)
+  .use(TaskModule)
   .get("/favicon.ico", () => Bun.file("src/../public/favicon.ico"))
   .get("/", () => Bun.file("src/../public/index.html"))
   .get("/elysia+bun.png", () => Bun.file("src/../public/elysia+bun.png"))
