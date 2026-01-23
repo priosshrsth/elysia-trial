@@ -3,11 +3,12 @@ import { appConfig } from "src/config/app.config";
 
 export const drizzleConfig = defineConfig({
   out: "./drizzle",
-  schema: "./src/db/schemas/index.ts",
+  schema: "./src/db/schema/auth.schema.ts",
   dialect: "postgresql",
+  casing: "snake_case",
   dbCredentials: {
     url: appConfig.DB_URL,
   },
 });
 
-export default defineConfig;
+export default drizzleConfig;

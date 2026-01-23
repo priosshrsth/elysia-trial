@@ -1,155 +1,116 @@
-# Turborepo starter
+# Turborepo – Bun‑First Full‑Stack Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+This repository is a **Turborepo-based monorepo** built with a **Bun-first mindset**.  
+It contains frontend applications, shared packages, and a backend API powered by **Elysia.js**.
 
-## Using this example
+The purpose of this repo is to provide a **clean, explicit, and type-safe foundation** for modern full‑stack development—without Node.js compatibility layers.
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
+## Repository Structure
+
+```
+apps/
+  api/        → Backend API (Elysia + Bun)
+  web/        → Next.js frontend
+  docs/       → Documentation site (Next.js)
+
+packages/
+  ui/         → Shared UI components
+  ts-config/ → Shared TypeScript configs
 ```
 
-## What's inside?
+All apps and packages are written in **TypeScript** and share common linting and formatting rules.
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+## Runtime & Package Management
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- **Runtime**: Bun
+- **Package manager**: Bun
+- **Task runner / orchestration**: Turborepo
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+This repository intentionally:
+- Uses **Bun instead of Node.js**
+- Uses **Bun instead of pnpm / npm / yarn**
+- Avoids Node compatibility adapters unless strictly required
 
-### Prisma setup
+---
 
-Prisma was initialized with followig commands:
+## Backend API
+
+The backend lives in:
+
+```
+apps/api
+```
+
+It is built with:
+- **Elysia.js**
+- **Bun runtime**
+- **Drizzle ORM**
+- **PostgreSQL (Bun native adapter)**
+- **Redis / Dragonfly for sessions**
+
+📘 **API documentation & architecture details**  
+→ See [`apps/api/README.md`](./apps/api/README.md)
+
+---
+
+## Turborepo & Monorepo Docs
+
+This repository uses Turborepo for:
+- Task orchestration
+- Build caching
+- Dependency graph optimization
+
+📘 **Turborepo-specific documentation**  
+→ See [`./turbo-repo.md`](./turbo-repo.md)
+
+---
+
+## Development Philosophy
+
+These principles apply across the entire monorepo:
+
+- Explicit over implicit
+- Bun-native over compatibility layers
+- Schemas over assumptions
+- Modules over monoliths
+- Tests alongside production code
+
+Project-specific rules (API schemas, response policies, testing strategy, etc.) are documented **inside each app/package** to avoid duplication.
+
+---
+
+## Getting Started
+
+Install dependencies:
 
 ```bash
-bun add @prisma/client prismabox --cwd ./apps/api
-bun add -d prisma --cwd ./apps/api
-cd apps/api
-bunx --bun prisma init --datasource-provider postgresql
+bun install
 ```
 
-### BetterAuth
-
-One time setup
-
-> No need to do anything. This is just for reference for future projects.
+Run all apps in development mode:
 
 ```bash
-cd apps/api
-bunx @better-auth/cli@latest generate --config src/modules/auth/auth.ts
+bun run dev
 ```
 
-### Utilities
+---
 
-This Turborepo has some additional tools already setup for you:
+## Where to Look Next
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [Biome](https://biomejs.dev/) + [Ultrcite](https://www.ultracite.ai/?ref=producthunt) for code linting
+- 📘 **API design, auth, schemas, testing**  
+  → `apps/api/README.md`
 
-### Build
+- 📘 **Monorepo & Turborepo details**  
+  → `turbo-repo.md`
 
-To build all apps and packages, run the following command:
+- 📘 **Frontend & UI docs**  
+  → `apps/web` and `packages/ui`
 
-```
-cd my-turborepo
+---
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+This root README is intentionally **high‑level**.  
+Detailed, app‑specific documentation lives close to the code it describes.

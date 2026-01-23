@@ -5,19 +5,19 @@
     "declarationMap": true,
     "esModuleInterop": true,
     "incremental": false,
+    "moduleResolution": "bundler",
     "isolatedModules": true,
     "lib": ["es2022", "DOM", "DOM.Iterable"],
-    "module": "NodeNext",
     "moduleDetection": "force",
-    "moduleResolution": "NodeNext",
     "noUncheckedIndexedAccess": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",
+    "baseUrl": ".",
     "paths": {
-      "@repo/ui/*": ["../../packages/ui/src/*"],
-      "@repo/types/*": ["../../packages/types/src/*"]
+      "types/*": ["../../packages/types/src/*"],
+      "types": ["../../packages/types/src"]
     }
   }
 }

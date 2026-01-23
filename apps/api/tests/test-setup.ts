@@ -1,9 +1,9 @@
 /// <reference types="bun-types/test-globals" />
 
-// Global test setup
 import { afterAll, beforeAll } from "bun:test";
 import { sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/bun-sql/migrator";
+// Global test setup
 import { appConfig } from "src/config/app.config";
 import { db } from "src/db";
 

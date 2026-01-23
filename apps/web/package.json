@@ -16,7 +16,7 @@
     "react-dom": "catalog:react"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
+    "@repo/ts-config": "workspace:*",
     "@types/node": "catalog:core",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
