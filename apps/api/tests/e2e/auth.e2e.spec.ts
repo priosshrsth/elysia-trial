@@ -23,11 +23,11 @@ describe("Better Auth Integration", () => {
   });
 
   it("Scenario 1: Register a new user", async () => {
-    // const response = await client.register.post({
-    //   email: "john@example.com",
-    //   password: "Secret@123",
-    //   name: "John Doe",
-    // });
-    // expect(response.status).toBe(200);
+    const response = await client.api.v1.auth["sign-up"].email.post({
+      email: "john@example.com",
+      password: "Secret@123",
+      name: "John Doe",
+    });
+    expect(response.status).toBe(200);
   });
 });
