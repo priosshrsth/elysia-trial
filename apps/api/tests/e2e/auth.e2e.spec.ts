@@ -1,8 +1,8 @@
 import { treaty } from "@elysiajs/eden";
-import { AuthModule } from "src/modules/auth/auth.module";
+import { app } from "src/main";
 
 describe("Better Auth Integration", () => {
-  const client = treaty(AuthModule, {
+  const client = treaty(app, {
     fetch: {
       credentials: "include",
       mode: "cors",
