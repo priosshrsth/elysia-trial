@@ -1,7 +1,7 @@
 import { cors } from "@elysiajs/cors";
-import { fromTypes, openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
-import { appConfig } from "src/config/app.config";
+import { appConfig } from "./config/app.config";
+import { openApiPlugin } from "./lib/openapi.plugin";
 import { AuthModule } from "./modules/auth/auth.module";
 import { TaskModule } from "./modules/task/task.module";
 
@@ -22,28 +22,7 @@ export const app = new Elysia()
 
     return error;
   })
-  .use(
-    openapi({
-      references: fromTypes(appConfig.NODE_ENV === "production" ? "dist/index.d.ts" : "src/main.ts"),
-      documentation: {
-        info: {
-          title: "API Documentation",
-          version: "1.0.0",
-          description: "API Documentation",
-        },
-        tags: [
-          {
-            name: "Auth",
-            description: "Authentication related endpoints",
-          },
-          {
-            name: "Tasks",
-            description: "Tasks related endpoints",
-          },
-        ],
-      },
-    }),
-  )
+  .use(openApiPlugin)
   .use(AuthModule)
   .use(TaskModule)
   .get("/favicon.ico", () => Bun.file("src/../public/favicon.ico"))
