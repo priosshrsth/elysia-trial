@@ -1,5 +1,5 @@
-import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { betterAuth } from "better-auth/minimal";
 import { openAPI } from "better-auth/plugins";
 import { appConfig } from "src/config/app.config";
 import { db } from "src/db";
@@ -89,8 +89,8 @@ export const auth = betterAuth({
   basePath: "/auth",
   plugins: [openAPI()],
   telemetry: {
-    enabled: true,
-    debug: true,
+    // enabled: true,
+    // debug: true,
   },
   user: {
     deleteUser: {

@@ -1,0 +1,24 @@
+{
+  "name": "@repo/emails",
+  "scripts": {
+    "build": "email build --dir src/emails",
+    "build:watch": "email build --dir src/emails --watch",
+    "dev": "email dev --dir src/emails -p 6100",
+    "export": "email export --dir src/emails",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "catalog:react",
+    "react-dom": "catalog:react",
+    "@react-email/components": "^1.0.6",
+    "@react-email/tailwind": "^2.0.3",
+    "@repo/ts-config": "workspace:*"
+  },
+  "devDependencies": {
+    "@react-email/preview-server": "5.2.5",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "react-email": "5.2.5",
+    "typescript": "catalog:core"
+  }
+}

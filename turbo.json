@@ -17,6 +17,19 @@
       "cache": false,
       "persistent": true
     },
+    "@repo/emails#dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "web#dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "api#dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["@repo/emails#build"]
+    },
     "db:push": {},
     "test": {}
   }

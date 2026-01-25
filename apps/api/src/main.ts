@@ -7,16 +7,18 @@ import { AuthModule } from "./modules/auth/auth.module";
 export const app = new Elysia()
   .use(cors())
   .onError(({ error }) => {
-    // if (error instanceof ValidationError) {
-    //   const data = JSON.parse(error.message) as {
-    //     errors: { path: string[]; message: string }[];
-    //     message: string;
-    //   };
-    //   const validationErrors = new Map(data.errors.map((error) => [error.path.join("."), error.message]));
-    //   return {
-    //     message: data.message,
-    //     validationErrors: Object.fromEntries(validationErrors.entries()),
-    //   };
+    console.log("error captured", error);
+    // if (error instanceof BetterAuthValidationError) {
+    //   console.log(error.cause);
+    //   // const data = JSON.parse(error.message) as {
+    //   //   errors: { path: string[]; message: string }[];
+    //   //   message: string;
+    //   // };
+    //   // const validationErrors = new Map(data.errors.map((error) => [error.path.join("."), error.message]));
+    //   // return {
+    //   //   message: data.message,
+    //   //   validationErrors: Object.fromEntries(validationErrors.entries()),
+    //   // };
     // }
 
     return error;
