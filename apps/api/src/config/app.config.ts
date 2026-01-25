@@ -26,7 +26,7 @@ export function getValidateEnv() {
     return validatedEnv;
   }
 
-  console.log("Validing env..");
+  console.log("Validating env..");
 
   validatedEnv = env.parse(process.env);
   return validatedEnv;

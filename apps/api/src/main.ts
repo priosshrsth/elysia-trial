@@ -3,7 +3,6 @@ import { Elysia } from "elysia";
 import { appConfig } from "./config/app.config";
 import { openApiPlugin } from "./lib/openapi.plugin";
 import { AuthModule } from "./modules/auth/auth.module";
-import { TaskModule } from "./modules/task/task.module";
 
 export const app = new Elysia()
   .use(cors())
@@ -24,7 +23,6 @@ export const app = new Elysia()
   })
   .use(openApiPlugin)
   .use(AuthModule)
-  .use(TaskModule)
   .get("/favicon.ico", () => Bun.file("src/../public/favicon.ico"))
   .get("/", () => Bun.file("src/../public/index.html"))
   .get("/elysia+bun.png", () => Bun.file("src/../public/elysia+bun.png"))
