@@ -21,7 +21,7 @@ bash -eo pipefail -c '
 [tasks.migration-generate]
 description = "Generate migration files"
 dir = "apps/api"
-run = "bun run migration:generate"
+run = "bun run migration:generate --name"
 
 [tasks.migration-run]
 description = "Run migration files"
