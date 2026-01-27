@@ -10,6 +10,13 @@
     "strict": true,
     "skipLibCheck": true,
     "baseUrl": ".",
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "paths": {
+      "src/*": ["./src/*"],
+      "@emails": ["../../packages/emails/src"],
+      "@emails/*": ["../../packages/emails/src/*"],
+      "types": ["../../packages/types/src"],
+      "types/*": ["../../packages/types/src/*"]
+    }
   }
 }

@@ -1,4 +1,3 @@
 [test]
-root = "tests"
 env = [".env.test.local"]
 preload = ["./tests/test-setup.ts"]

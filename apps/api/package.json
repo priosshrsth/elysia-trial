@@ -12,22 +12,27 @@
     "email": "email dev --dir src/modules/email/templates"
   },
   "dependencies": {
+    "@elysiajs/bearer": "^1.4.2",
     "@elysiajs/cors": "^1.4.1",
     "@elysiajs/static": "^1.4.7",
+    "@react-email/render": "^2.0.4",
+    "@repo/emails": "workspace:*",
     "@repo/types": "workspace:*",
-    "better-auth": "^1.4.17",
+    "better-auth": "^1.4.18",
     "drizzle-orm": "^0.45.1",
-    "elysia": "^1.4.22",
+    "elysia": "^1.4.25",
+    "nodemailer": "^8.0.1",
     "uuid": "^13.0.0",
     "zod": "catalog:lib"
   },
   "devDependencies": {
     "@elysiajs/eden": "^1.4.6",
     "@elysiajs/openapi": "^1.4.14",
+    "@faker-js/faker": "^10.3.0",
     "@repo/ts-config": "workspace:*",
     "@types/bun": "catalog:core",
-    "drizzle-kit": "^0.31.8",
-    "pg": "^8.17.2",
+    "@types/nodemailer": "^7.0.9",
+    "drizzle-kit": "^0.31.9",
     "typescript": "catalog:core"
   }
 }

@@ -4,25 +4,30 @@ import { openAPI } from "better-auth/plugins";
 import { appConfig } from "src/config/app.config";
 import { db } from "src/db";
 import { redis } from "src/lib/redis";
+import { emailService } from "src/modules/emails/email.service";
+import { EmailTemplate } from "types";
 import { v4 as uuidv4 } from "uuid";
 
 export const auth = betterAuth({
   secret: appConfig.AUTH_SECRET,
+  baseURL: appConfig.BETTER_AUTH_BASE_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
-    debugLogs: true,
+    debugLogs: false,
   }),
   disabledPaths: ["/account-info"],
   emailVerification: {
     autoSignInAfterVerification: true,
     sendVerificationEmail(data, _request) {
-      // return sendEmail({
-      //   to: user.email,
-      //   subject: "Verify your email address",
-      //   text: `Click the link to verify your email: ${url}`,
-      // });
-      console.log(data);
-      return Promise.resolve();
+      return emailService.sendEmail({
+        template: EmailTemplate.WELCOME,
+        to: data.user.email,
+        subject: "Verify your email address",
+        props: {
+          verificationUrl: data.url,
+          name: data.user.name,
+        },
+      });
     },
     sendOnSignUp: true,
   },
@@ -40,7 +45,7 @@ export const auth = betterAuth({
       version: "1",
       enabled: true,
       maxAge: 15 * 60, // 15 minutes (short lived cookie)
-      refreshCache: true,
+      refreshCache: false,
     },
   },
   account: {
