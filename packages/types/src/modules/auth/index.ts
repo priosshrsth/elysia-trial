@@ -1,4 +1,1 @@
-export * from "./const/auth.const";
-export * from "./schema/register.schema";
-export * from "./schema/session.schema";
-export * from "./schema/verification.schema";
+export * from "./schemas/register.schema";

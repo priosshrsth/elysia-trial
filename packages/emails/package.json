@@ -1,0 +1,38 @@
+{
+  "name": "@repo/emails",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "bun build --minify --outfile ./dist/index.mjs src/index.ts",
+    "build:watch": "bun run build --watch",
+    "serve": "email dev --dir src/emails -p 6100",
+    "dev": "bun run --parallel build:watch serve",
+    "export": "email export --dir src/emails",
+    "check-types": "tsc -p ./tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "react": "catalog:react",
+    "react-dom": "catalog:react",
+    "@react-email/components": "^1.0.6",
+    "@react-email/tailwind": "^2.0.3",
+    "@repo/ts-config": "workspace:*",
+    "@repo/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@react-email/preview-server": "5.2.5",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "react-email": "5.2.5",
+    "typescript": "catalog:core"
+  }
+}

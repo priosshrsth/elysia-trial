@@ -4,11 +4,9 @@ import { afterAll, beforeAll } from "bun:test";
 import { sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/bun-sql/migrator";
 // Global test setup
-import { appConfig } from "src/config/app.config";
 import { db } from "src/db";
 
 beforeAll(async () => {
-  console.log(appConfig);
   // apply migration for drizzle
   await migrate(db, { migrationsFolder: "./drizzle" });
 });

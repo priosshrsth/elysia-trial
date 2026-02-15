@@ -1,0 +1,19 @@
+{
+  "extends": "@repo/ts-config/base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "types": ["../../packages/types/src"],
+      "types/*": ["../../packages/types/src/*"],
+      "@emails/*": ["./src/*"],
+      "@emails": ["./src"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

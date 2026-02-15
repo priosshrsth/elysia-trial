@@ -18,12 +18,12 @@ bash -eo pipefail -c '
 """
 
 
-[tasks.migration-generate]
+[tasks."gen:migration"]
 description = "Generate migration files"
 dir = "apps/api"
 run = "bun run migration:generate --name"
 
-[tasks.migration-run]
+[tasks."run:migration"]
 description = "Run migration files"
 dir = "apps/api"
 run = "bun run migration:run"

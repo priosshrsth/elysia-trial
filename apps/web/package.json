@@ -13,7 +13,8 @@
     "@repo/ui": "workspace:*",
     "next": "catalog:react",
     "react": "catalog:react",
-    "react-dom": "catalog:react"
+    "react-dom": "catalog:react",
+    "zod": "catalog:lib"
   },
   "devDependencies": {
     "@repo/ts-config": "workspace:*",

@@ -5,6 +5,8 @@
     "declarationMap": true,
     "esModuleInterop": true,
     "incremental": false,
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "lib": ["es2022", "DOM", "DOM.Iterable"],
@@ -13,11 +15,10 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2022",
-    "baseUrl": ".",
     "paths": {
+      "types": ["../../packages/types/src"],
       "types/*": ["../../packages/types/src/*"],
-      "types": ["../../packages/types/src"]
+      "src/*": ["./src/*"]
     }
   }
 }

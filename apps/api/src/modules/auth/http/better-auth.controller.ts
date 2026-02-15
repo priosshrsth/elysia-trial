@@ -12,7 +12,11 @@ const genericResponses = {
   500: BetterAuthErrorResponseSchema,
 };
 
-export const FakeBetterAuthController = new Elysia({ name: "better-auth.controller", detail: { hide: true } })
+export const FakeBetterAuthController = new Elysia({
+  name: "better-auth.controller",
+  detail: { hide: true },
+  prefix: "/api/v1/auth",
+})
   // /sign-in/social (POST)
   .post("/sign-in/social", () => "" as unknown as ReturnType<typeof auth.api.signInSocial>, {
     body: auth.api.signInSocial.options?.body,
@@ -253,11 +257,12 @@ export const FakeBetterAuthController = new Elysia({ name: "better-auth.controll
     },
   });
 
-export const BetterAuthController = new Elysia({
-  detail: {
-    hide: true,
-  },
-  prefix: "/api/v1/auth",
-}).use(new Elysia() as unknown as typeof FakeBetterAuthController);
+export const BetterAuthController = new Elysia().mount("/api/v1", auth.handler).use(
+  new Elysia({
+    detail: {
+      hide: true,
+    },
+  }) as unknown as typeof FakeBetterAuthController,
+);
 
 export type IBetterAuthController = typeof BetterAuthController;
