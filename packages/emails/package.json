@@ -33,7 +33,6 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "react-email": "5.2.5",
-    "tsdown": "^0.20.1",
     "typescript": "catalog:core"
   }
 }
