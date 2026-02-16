@@ -39,3 +39,6 @@ yarn-error.log*
 # TODO: remove this
 apps/api/temp
 
+.terraform
+.terraform.lock.hcl
+
