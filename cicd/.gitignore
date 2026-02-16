@@ -4,4 +4,4 @@
 /**/.terraform
 /**/.terraform.lock.hcl
 /**/.terraform.tfstate.lock.info
-/**/secret.tfvars
+/**/secrets.tfvars
