@@ -1,5 +1,0 @@
-app_name        = "elysia"
-billing_account = "YOUR_BILLING_ACCOUNT_ID"
-org_id          = "YOUR_ORG_ID"
-folder_id       = "YOUR_FOLDER_ID"
-region          = "us-central1"

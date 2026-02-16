@@ -2,21 +2,19 @@
 bun = "latest"
 node = "24"
 
+# ---------- Housekeeping ----------
+
 [tasks.cleanup]
 description = "Cleanup node_modules, build outputs and lockfiles"
 run = """
 bash -eo pipefail -c '
-  # Remove all node_modules directories
   find . -type d -name node_modules -prune -exec rm -rf {} +
-
-  # Remove all dist directories
   find . -type d -name dist -prune -exec rm -rf {} +
-
-  # Remove all .next directories
   find . -type d -name .next -prune -exec rm -rf {} +
 '
 """
 
+# ---------- Database ----------
 
 [tasks."gen:migration"]
 description = "Generate migration files"
@@ -27,3 +25,52 @@ run = "bun run migration:generate --name"
 description = "Run migration files"
 dir = "apps/api"
 run = "bun run migration:run"
+
+# ---------- Infrastructure ----------
+
+[tasks."infra:init"]
+description = "Bootstrap GCS bucket, enable APIs, and init Terraform"
+run = "bun run cicd/scripts/init.ts"
+
+[tasks."infra:plan"]
+description = "Terraform plan for a layer (usage: mise run infra:plan -- <platform|api|web>)"
+run = "bun run cicd/scripts/infra.ts plan {{arg(name=\"layer\")}}"
+
+[tasks."infra:deploy"]
+description = "Terraform apply for a layer (usage: mise run infra:deploy -- <platform|api|web>)"
+run = "bun run cicd/scripts/infra.ts apply {{arg(name=\"layer\")}}"
+
+[tasks."infra:destroy"]
+description = "Terraform destroy for a layer (usage: mise run infra:destroy -- <platform|api|web>)"
+run = "bun run cicd/scripts/infra.ts destroy {{arg(name=\"layer\")}}"
+
+[tasks."infra:all"]
+description = "Deploy all layers in order: platform -> api -> web"
+depends = ["infra:deploy -- platform", "infra:deploy -- api", "infra:deploy -- web"]
+
+# ---------- Deploy ----------
+
+[tasks."deploy:api"]
+description = "Build and deploy API to Cloud Run (usage: mise run deploy:api -- <prod|staging|preview> [previewId])"
+run = "bun run cicd/scripts/build-and-deploy.ts api {{arg(name=\"env\")}} {{arg(name=\"previewId\", default=\"\")}}"
+
+[tasks."deploy:web"]
+description = "Build and deploy Web to Cloud Run (usage: mise run deploy:web -- <prod|staging|preview> [previewId])"
+run = "bun run cicd/scripts/build-and-deploy.ts web {{arg(name=\"env\")}} {{arg(name=\"previewId\", default=\"\")}}"
+
+[tasks."deploy:all"]
+description = "Deploy both API and Web to prod"
+run = """
+bun run cicd/scripts/build-and-deploy.ts api prod
+bun run cicd/scripts/build-and-deploy.ts web prod
+"""
+
+# ---------- Preview ----------
+
+[tasks."preview:create"]
+description = "Create a preview environment (usage: mise run preview:create -- <previewId>)"
+run = "bun run cicd/scripts/preview.ts create {{arg(name=\"previewId\")}}"
+
+[tasks."preview:destroy"]
+description = "Destroy a preview environment (usage: mise run preview:destroy -- <previewId>)"
+run = "bun run cicd/scripts/preview.ts destroy {{arg(name=\"previewId\")}}"

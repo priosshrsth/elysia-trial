@@ -1,0 +1,99 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [staging]
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  REGION: us-central1
+  AR_REPO: us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/elysia
+
+jobs:
+  build-deploy-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SA_EMAIL }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: true
+          tags: |
+            ${{ env.AR_REPO }}/api:staging-latest
+            ${{ env.AR_REPO }}/api:staging-${{ github.sha }}
+          cache-from: type=gha,scope=api-staging
+          cache-to: type=gha,mode=max,scope=api-staging
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy api-staging \
+            --image ${{ env.AR_REPO }}/api:staging-${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "NODE_ENV=staging,PORT=3001,BETTER_AUTH_BASE_URL=${{ vars.API_STAGING_URL }},TRUSTED_DOMAINS=${{ vars.WEB_STAGING_URL }},EMAIL_FROM=noreply@elysia.dev" \
+            --update-secrets "DB_URL=api-staging-DB_URL:latest,REDIS_URL=api-staging-REDIS_URL:latest,AUTH_SECRET=api-staging-AUTH_SECRET:latest,COOKIE_KEY=api-staging-COOKIE_KEY:latest,SMTP_HOST=api-staging-SMTP_HOST:latest,SMTP_PORT=api-staging-SMTP_PORT:latest,SMTP_USER=api-staging-SMTP_USER:latest,SMTP_PASS=api-staging-SMTP_PASS:latest" \
+            --port 3001 \
+            --cpu 1 --memory 512Mi \
+            --min-instances 0 --max-instances 1 \
+            --vpc-connector elysia-vpc-cx \
+            --vpc-egress private-ranges-only
+
+  build-deploy-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SA_EMAIL }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: true
+          tags: |
+            ${{ env.AR_REPO }}/web:staging-latest
+            ${{ env.AR_REPO }}/web:staging-${{ github.sha }}
+          cache-from: type=gha,scope=web-staging
+          cache-to: type=gha,mode=max,scope=web-staging
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy web-staging \
+            --image ${{ env.AR_REPO }}/web:staging-${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "NODE_ENV=staging" \
+            --port 3000 \
+            --cpu 1 --memory 512Mi \
+            --min-instances 0 --max-instances 1

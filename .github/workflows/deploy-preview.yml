@@ -1,0 +1,110 @@
+name: Deploy Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"
+        required: true
+        type: string
+      preview_id:
+        description: "Preview ID (e.g., PR number or short name)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  REGION: us-central1
+  AR_REPO: us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/elysia
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SA_EMAIL }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Create preview database
+      - name: Create preview database
+        run: |
+          gcloud compute ssh elysia-db \
+            --zone ${{ env.REGION }}-c \
+            --tunnel-through-iap \
+            --project ${{ vars.GCP_PROJECT_ID }} \
+            --command "docker exec postgres psql -U postgres -c 'CREATE DATABASE elysia_preview_${{ inputs.preview_id }};'" || true
+
+      - name: Build and push API
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: true
+          tags: ${{ env.AR_REPO }}/api:preview-${{ inputs.preview_id }}
+          cache-from: type=gha,scope=api-preview
+          cache-to: type=gha,mode=max,scope=api-preview
+
+      - name: Build and push Web
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: true
+          tags: ${{ env.AR_REPO }}/web:preview-${{ inputs.preview_id }}
+          cache-from: type=gha,scope=web-preview
+          cache-to: type=gha,mode=max,scope=web-preview
+
+      - name: Deploy API preview
+        run: |
+          gcloud run deploy api-preview-${{ inputs.preview_id }} \
+            --image ${{ env.AR_REPO }}/api:preview-${{ inputs.preview_id }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "NODE_ENV=staging,PORT=3001,EMAIL_FROM=noreply@elysia.dev" \
+            --update-secrets "AUTH_SECRET=api-staging-AUTH_SECRET:latest,COOKIE_KEY=api-staging-COOKIE_KEY:latest,SMTP_HOST=api-staging-SMTP_HOST:latest,SMTP_PORT=api-staging-SMTP_PORT:latest,SMTP_USER=api-staging-SMTP_USER:latest,SMTP_PASS=api-staging-SMTP_PASS:latest" \
+            --port 3001 \
+            --cpu 1 --memory 512Mi \
+            --min-instances 0 --max-instances 1 \
+            --vpc-connector elysia-vpc-cx \
+            --vpc-egress private-ranges-only
+
+      - name: Get API URL
+        id: api-url
+        run: |
+          URL=$(gcloud run services describe api-preview-${{ inputs.preview_id }} --region ${{ env.REGION }} --format 'value(status.url)')
+          echo "url=$URL" >> $GITHUB_OUTPUT
+
+      - name: Deploy Web preview
+        run: |
+          gcloud run deploy web-preview-${{ inputs.preview_id }} \
+            --image ${{ env.AR_REPO }}/web:preview-${{ inputs.preview_id }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "NODE_ENV=staging,NEXT_PUBLIC_API_URL=${{ steps.api-url.outputs.url }}" \
+            --port 3000 \
+            --cpu 1 --memory 512Mi \
+            --min-instances 0 --max-instances 1
+
+      - name: Output preview URLs
+        run: |
+          API_URL=$(gcloud run services describe api-preview-${{ inputs.preview_id }} --region ${{ env.REGION }} --format 'value(status.url)')
+          WEB_URL=$(gcloud run services describe web-preview-${{ inputs.preview_id }} --region ${{ env.REGION }} --format 'value(status.url)')
+          echo "## Preview Environment: ${{ inputs.preview_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **API:** $API_URL" >> $GITHUB_STEP_SUMMARY
+          echo "- **Web:** $WEB_URL" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,16 @@
+.git
+.github
+.turbo
+.next
+node_modules
+**/node_modules
+**/.turbo
+**/dist
+**/.next
+.env*
+**/.env*
+cicd/
+*.md
+.vscode
+.zed
+.idea

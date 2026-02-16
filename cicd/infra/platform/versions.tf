@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.14.5"
+  required_version = ">= 1.5.0"
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -13,6 +13,6 @@ terraform {
 
   backend "gcs" {
     bucket = "elysia-terraform-state"
-    prefix = "terraform/state"
+    prefix = "platform"
   }
 }
