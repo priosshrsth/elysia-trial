@@ -46,7 +46,7 @@ variable "db_password" {
 
 variable "vm_machine_type" {
   type    = string
-  default = "e2-small"
+  default = "e2-micro"
 }
 
 variable "environments" {

@@ -14,11 +14,13 @@ permissions:
 
 env:
   REGION: us-central1
-  AR_REPO: us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/elysia
+  AR_REPO: us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/servio
 
 jobs:
   build-deploy-api:
     runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.url.outputs.url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -51,16 +53,24 @@ jobs:
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars "NODE_ENV=staging,PORT=3001,BETTER_AUTH_BASE_URL=${{ vars.API_STAGING_URL }},TRUSTED_DOMAINS=${{ vars.WEB_STAGING_URL }},EMAIL_FROM=noreply@elysia.dev" \
+            --set-env-vars "NODE_ENV=staging,PORT=3001,EMAIL_FROM=noreply@servio.dev" \
             --update-secrets "DB_URL=api-staging-DB_URL:latest,REDIS_URL=api-staging-REDIS_URL:latest,AUTH_SECRET=api-staging-AUTH_SECRET:latest,COOKIE_KEY=api-staging-COOKIE_KEY:latest,SMTP_HOST=api-staging-SMTP_HOST:latest,SMTP_PORT=api-staging-SMTP_PORT:latest,SMTP_USER=api-staging-SMTP_USER:latest,SMTP_PASS=api-staging-SMTP_PASS:latest" \
             --port 3001 \
             --cpu 1 --memory 512Mi \
             --min-instances 0 --max-instances 1 \
-            --vpc-connector elysia-vpc-cx \
+            --vpc-connector servio-vpc-cx \
             --vpc-egress private-ranges-only
+
+      - name: Get service URL
+        id: url
+        run: |
+          URL=$(gcloud run services describe api-staging --region ${{ env.REGION }} --format 'value(status.url)')
+          echo "url=$URL" >> $GITHUB_OUTPUT
 
   build-deploy-web:
     runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.url.outputs.url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -97,3 +107,26 @@ jobs:
             --port 3000 \
             --cpu 1 --memory 512Mi \
             --min-instances 0 --max-instances 1
+
+      - name: Get service URL
+        id: url
+        run: |
+          URL=$(gcloud run services describe web-staging --region ${{ env.REGION }} --format 'value(status.url)')
+          echo "url=$URL" >> $GITHUB_OUTPUT
+
+  configure:
+    needs: [build-deploy-api, build-deploy-web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SA_EMAIL }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Update API with service URLs
+        run: |
+          gcloud run services update api-staging \
+            --region ${{ env.REGION }} \
+            --update-env-vars "BETTER_AUTH_BASE_URL=${{ needs.build-deploy-api.outputs.url }},TRUSTED_DOMAINS=${{ needs.build-deploy-web.outputs.url }}"

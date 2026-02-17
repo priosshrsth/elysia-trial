@@ -1,4 +1,4 @@
-app_name     = "elysia"
+app_name     = "servio"
 region       = "us-central1"
 environments = ["prod", "staging"]
 

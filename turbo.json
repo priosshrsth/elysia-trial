@@ -21,6 +21,7 @@
     },
     "db:push": {},
     "test": {
+      "dependsOn": ["^build"],
       "cache": false
     }
   }

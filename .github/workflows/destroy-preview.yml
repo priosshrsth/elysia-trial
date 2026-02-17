@@ -35,15 +35,15 @@ jobs:
 
       - name: Drop preview database
         run: |
-          gcloud compute ssh elysia-db \
+          gcloud compute ssh servio-db \
             --zone ${{ env.REGION }}-c \
             --tunnel-through-iap \
             --project ${{ vars.GCP_PROJECT_ID }} \
-            --command "docker exec postgres psql -U postgres -c 'DROP DATABASE IF EXISTS elysia_preview_${{ inputs.preview_id }};'"
+            --command "docker exec postgres psql -U postgres -c 'DROP DATABASE IF EXISTS servio_preview_${{ inputs.preview_id }};'"
 
       - name: Cleanup images
         run: |
           gcloud artifacts docker images delete \
-            ${{ env.REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/elysia/api:preview-${{ inputs.preview_id }} --quiet || true
+            ${{ env.REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/servio/api:preview-${{ inputs.preview_id }} --quiet || true
           gcloud artifacts docker images delete \
-            ${{ env.REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/elysia/web:preview-${{ inputs.preview_id }} --quiet || true
+            ${{ env.REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/servio/web:preview-${{ inputs.preview_id }} --quiet || true

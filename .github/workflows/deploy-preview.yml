@@ -18,7 +18,7 @@ permissions:
 
 env:
   REGION: us-central1
-  AR_REPO: us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/elysia
+  AR_REPO: us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/servio
 
 jobs:
   deploy-preview:
@@ -42,18 +42,18 @@ jobs:
       # Create preview database
       - name: Create preview database
         run: |
-          gcloud compute ssh elysia-db \
+          gcloud compute ssh servio-db \
             --zone ${{ env.REGION }}-c \
             --tunnel-through-iap \
             --project ${{ vars.GCP_PROJECT_ID }} \
-            --command "docker exec postgres psql -U postgres -c 'CREATE DATABASE elysia_preview_${{ inputs.preview_id }};'" || true
+            --command "docker exec postgres psql -U postgres -c 'CREATE DATABASE servio_preview_${{ inputs.preview_id }};'" || true
 
       # Construct preview DB_URL from staging secret (same host/credentials, different database name)
       - name: Construct preview DB_URL
         id: db-url
         run: |
           STAGING_DB_URL=$(gcloud secrets versions access latest --secret=api-staging-DB_URL --project=${{ vars.GCP_PROJECT_ID }})
-          PREVIEW_DB_URL=$(echo "$STAGING_DB_URL" | sed "s|/[^/?]*\([?]\)|/elysia_preview_${{ inputs.preview_id }}\1|;t;s|/[^/]*$|/elysia_preview_${{ inputs.preview_id }}|")
+          PREVIEW_DB_URL=$(echo "$STAGING_DB_URL" | sed "s|/[^/?]*\([?]\)|/servio_preview_${{ inputs.preview_id }}\1|;t;s|/[^/]*$|/servio_preview_${{ inputs.preview_id }}|")
           echo "::add-mask::$PREVIEW_DB_URL"
           echo "url=$PREVIEW_DB_URL" >> $GITHUB_OUTPUT
 
@@ -84,12 +84,12 @@ jobs:
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars "NODE_ENV=staging,PORT=3001,EMAIL_FROM=noreply@elysia.dev,DB_URL=${{ steps.db-url.outputs.url }}" \
+            --set-env-vars "NODE_ENV=staging,PORT=3001,EMAIL_FROM=noreply@servio.dev,DB_URL=${{ steps.db-url.outputs.url }}" \
             --update-secrets "REDIS_URL=api-staging-REDIS_URL:latest,AUTH_SECRET=api-staging-AUTH_SECRET:latest,COOKIE_KEY=api-staging-COOKIE_KEY:latest,SMTP_HOST=api-staging-SMTP_HOST:latest,SMTP_PORT=api-staging-SMTP_PORT:latest,SMTP_USER=api-staging-SMTP_USER:latest,SMTP_PASS=api-staging-SMTP_PASS:latest" \
             --port 3001 \
             --cpu 1 --memory 512Mi \
             --min-instances 0 --max-instances 1 \
-            --vpc-connector elysia-vpc-cx \
+            --vpc-connector servio-vpc-cx \
             --vpc-egress private-ranges-only
 
       - name: Get API URL

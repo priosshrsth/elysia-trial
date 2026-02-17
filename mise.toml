@@ -26,6 +26,57 @@ description = "Run migration files"
 dir = "apps/api"
 run = "bun run migration:run"
 
+# ---------- Remote Database ----------
+
+[tasks."ssh:db"]
+description = "SSH into DB VM via IAP tunnel"
+run = """
+gcloud compute ssh servio-db \
+  --zone ${GCP_REGION:-us-central1}-c \
+  --tunnel-through-iap \
+  --project ${GCP_PROJECT_ID:?Set GCP_PROJECT_ID}
+"""
+
+[tasks."db:tunnel"]
+description = "Port-forward local 5433 to remote DB (usage: connect to localhost:5433)"
+run = """
+echo "Tunnel open: postgresql://postgres:<password>@localhost:5433/servio_<env>"
+echo "Press Ctrl+C to close"
+gcloud compute ssh servio-db \
+  --zone ${GCP_REGION:-us-central1}-c \
+  --tunnel-through-iap \
+  --project ${GCP_PROJECT_ID:?Set GCP_PROJECT_ID} \
+  -- -N -L 5433:localhost:5432
+"""
+
+[tasks."db:migrate:remote"]
+description = "Run migrations against remote DB (usage: mise run db:migrate:remote -- <prod|staging>)"
+dir = "apps/api"
+run = """
+bash -eo pipefail -c '
+  ENV="{{arg(name="env")}}"
+  if [ "$ENV" != "prod" ] && [ "$ENV" != "staging" ]; then
+    echo "Usage: mise run db:migrate:remote -- <prod|staging>"
+    exit 1
+  fi
+  DB_NAME="servio_${ENV}"
+  PROJECT=${GCP_PROJECT_ID:?Set GCP_PROJECT_ID}
+  ZONE="${GCP_REGION:-us-central1}-c"
+
+  echo "Starting IAP tunnel to ${DB_NAME}..."
+  gcloud compute ssh servio-db --zone $ZONE --tunnel-through-iap --project $PROJECT -- -N -L 5433:localhost:5432 &
+  TUNNEL_PID=$!
+  sleep 3
+
+  echo "Running migrations on ${DB_NAME}..."
+  DB_URL="postgresql://postgres:${DB_PASSWORD:?Set DB_PASSWORD}@localhost:5433/${DB_NAME}" bun run migration:run
+  EXIT_CODE=$?
+
+  kill $TUNNEL_PID 2>/dev/null || true
+  exit $EXIT_CODE
+'
+"""
+
 # ---------- Infrastructure ----------
 
 [tasks."infra:init"]

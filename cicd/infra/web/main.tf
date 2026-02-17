@@ -29,8 +29,8 @@ module "cloud_run" {
   vpc_connector_id = local.platform.vpc_connector_id
   service_account  = local.platform.cloud_run_sa_email
   port             = 3000
-  min_instances    = each.key == "prod" ? 1 : 0
-  max_instances    = each.key == "prod" ? 2 : 1
+  min_instances    = 0
+  max_instances    = 1
   cpu              = "1"
   memory           = "512Mi"
 }
