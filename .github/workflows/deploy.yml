@@ -1,12 +1,12 @@
-name: Deploy Staging
+name: Deploy
 
 on:
-  push:
-    branches: [staging]
+  release:
+    types: [published]
 
 concurrency:
-  group: deploy-staging
-  cancel-in-progress: true
+  group: deploy-${{ github.event.release.prerelease && 'staging' || 'prod' }}
+  cancel-in-progress: ${{ github.event.release.prerelease }}
 
 permissions:
   contents: read
@@ -15,6 +15,9 @@ permissions:
 env:
   REGION: us-central1
   AR_REPO: us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/servio
+  ENV: ${{ github.event.release.prerelease && 'staging' || 'prod' }}
+  NODE_ENV: ${{ github.event.release.prerelease && 'staging' || 'production' }}
+  TAG: ${{ github.event.release.tag_name }}
 
 jobs:
   build-deploy-api:
@@ -41,30 +44,30 @@ jobs:
           file: apps/api/Dockerfile
           push: true
           tags: |
-            ${{ env.AR_REPO }}/api:staging-latest
-            ${{ env.AR_REPO }}/api:staging-${{ github.sha }}
-          cache-from: type=gha,scope=api-staging
-          cache-to: type=gha,mode=max,scope=api-staging
+            ${{ env.AR_REPO }}/api:${{ env.ENV }}-latest
+            ${{ env.AR_REPO }}/api:${{ env.TAG }}
+          cache-from: type=gha,scope=api-${{ env.ENV }}
+          cache-to: type=gha,mode=max,scope=api-${{ env.ENV }}
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy api-staging \
-            --image ${{ env.AR_REPO }}/api:staging-${{ github.sha }} \
+          gcloud run deploy api-${{ env.ENV }} \
+            --image ${{ env.AR_REPO }}/api:${{ env.TAG }} \
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars "NODE_ENV=staging,PORT=3001,EMAIL_FROM=noreply@servio.dev" \
-            --update-secrets "DB_URL=api-staging-DB_URL:latest,REDIS_URL=api-staging-REDIS_URL:latest,AUTH_SECRET=api-staging-AUTH_SECRET:latest,COOKIE_KEY=api-staging-COOKIE_KEY:latest,SMTP_HOST=api-staging-SMTP_HOST:latest,SMTP_PORT=api-staging-SMTP_PORT:latest,SMTP_USER=api-staging-SMTP_USER:latest,SMTP_PASS=api-staging-SMTP_PASS:latest" \
+            --set-env-vars "NODE_ENV=${{ env.NODE_ENV }},PORT=3001,EMAIL_FROM=noreply@servio.dev" \
+            --update-secrets "DB_URL=api-${{ env.ENV }}-DB_URL:latest,REDIS_URL=api-${{ env.ENV }}-REDIS_URL:latest,AUTH_SECRET=api-${{ env.ENV }}-AUTH_SECRET:latest,COOKIE_KEY=api-${{ env.ENV }}-COOKIE_KEY:latest,SMTP_HOST=api-${{ env.ENV }}-SMTP_HOST:latest,SMTP_PORT=api-${{ env.ENV }}-SMTP_PORT:latest,SMTP_USER=api-${{ env.ENV }}-SMTP_USER:latest,SMTP_PASS=api-${{ env.ENV }}-SMTP_PASS:latest" \
             --port 3001 \
             --cpu 1 --memory 512Mi \
-            --min-instances 0 --max-instances 1 \
+            --min-instances 0 --max-instances ${{ env.ENV == 'prod' && '2' || '1' }} \
             --vpc-connector servio-vpc-cx \
             --vpc-egress private-ranges-only
 
       - name: Get service URL
         id: url
         run: |
-          URL=$(gcloud run services describe api-staging --region ${{ env.REGION }} --format 'value(status.url)')
+          URL=$(gcloud run services describe api-${{ env.ENV }} --region ${{ env.REGION }} --format 'value(status.url)')
           echo "url=$URL" >> $GITHUB_OUTPUT
 
   build-deploy-web:
@@ -91,19 +94,19 @@ jobs:
           file: apps/web/Dockerfile
           push: true
           tags: |
-            ${{ env.AR_REPO }}/web:staging-latest
-            ${{ env.AR_REPO }}/web:staging-${{ github.sha }}
-          cache-from: type=gha,scope=web-staging
-          cache-to: type=gha,mode=max,scope=web-staging
+            ${{ env.AR_REPO }}/web:${{ env.ENV }}-latest
+            ${{ env.AR_REPO }}/web:${{ env.TAG }}
+          cache-from: type=gha,scope=web-${{ env.ENV }}
+          cache-to: type=gha,mode=max,scope=web-${{ env.ENV }}
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy web-staging \
-            --image ${{ env.AR_REPO }}/web:staging-${{ github.sha }} \
+          gcloud run deploy web-${{ env.ENV }} \
+            --image ${{ env.AR_REPO }}/web:${{ env.TAG }} \
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars "NODE_ENV=staging" \
+            --set-env-vars "NODE_ENV=${{ env.NODE_ENV }}" \
             --port 3000 \
             --cpu 1 --memory 512Mi \
             --min-instances 0 --max-instances 1
@@ -111,7 +114,7 @@ jobs:
       - name: Get service URL
         id: url
         run: |
-          URL=$(gcloud run services describe web-staging --region ${{ env.REGION }} --format 'value(status.url)')
+          URL=$(gcloud run services describe web-${{ env.ENV }} --region ${{ env.REGION }} --format 'value(status.url)')
           echo "url=$URL" >> $GITHUB_OUTPUT
 
   configure:
@@ -127,6 +130,6 @@ jobs:
 
       - name: Update API with service URLs
         run: |
-          gcloud run services update api-staging \
+          gcloud run services update api-${{ env.ENV }} \
             --region ${{ env.REGION }} \
             --update-env-vars "BETTER_AUTH_BASE_URL=${{ needs.build-deploy-api.outputs.url }},TRUSTED_DOMAINS=${{ needs.build-deploy-web.outputs.url }}"
