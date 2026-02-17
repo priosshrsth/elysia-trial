@@ -14,7 +14,7 @@ export const openApiPlugin = openapi({
     paths: await AuthOpenApi.getPaths(),
     security: await AuthOpenApi.getSecurity,
     info: {
-      title: "API Documentation",
+      title: "Servio API Documentation",
       version: "1.0.0",
       description: "API Documentation",
     },

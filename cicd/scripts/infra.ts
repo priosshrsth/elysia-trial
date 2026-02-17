@@ -2,9 +2,16 @@
 
 import { join } from "node:path";
 import { $ } from "bun";
+import { getProjectId } from "./lib/env";
 import { infraDir } from "./lib/paths";
 
 const VALID_LAYERS = new Set(["platform", "api", "web"]);
+
+// Set TF_VAR_tf_state_bucket for all layers
+const projectId = getProjectId();
+if (!process.env.TF_VAR_tf_state_bucket) {
+  process.env.TF_VAR_tf_state_bucket = `${projectId}-terraform-state`;
+}
 
 const args = process.argv.slice(2);
 const command = args[0]; // plan, apply, destroy

@@ -2,7 +2,7 @@
 
 ## Architecture
 
-- **GCP Cloud Run** — API (Elysia/Bun) + Web (Next.js standalone)
+- **GCP Cloud Run** — API (Servio/Bun) + Web (Next.js standalone)
 - **Compute Engine VM** — PostgreSQL 16 + Dragonfly (Redis-compatible)
 - **Single GCP project** — environments separated by naming (`api-prod`, `web-staging`, etc.)
 - **Terraform** — layered: `platform/` (shared), `api/`, `web/`
@@ -11,7 +11,11 @@
 ## Prerequisites
 
 - GCP project with billing enabled
-- `gcloud` CLI authenticated (`gcloud auth application-default login`)
+- `gcloud` CLI authenticated and **ADC configured**:
+  ```bash
+  gcloud auth login
+  gcloud auth application-default login
+  ```
 - `terraform` CLI installed (>= 1.5)
 - `mise` installed
 - Docker running locally (for manual deploys)
@@ -26,7 +30,7 @@ GCP_PROJECT_ID=your-project-id mise run infra:init
 TF_VAR_project_id=your-project-id \
 TF_VAR_billing_account=XXXXXX-XXXXXX-XXXXXX \
 TF_VAR_github_org=your-org \
-TF_VAR_github_repo=elysia \
+TF_VAR_github_repo=servio \
 TF_VAR_db_password=your-secure-password \
   mise run infra:deploy -- platform
 
@@ -37,7 +41,7 @@ TF_VAR_project_id=your-project-id mise run infra:deploy -- api
 TF_VAR_project_id=your-project-id mise run infra:deploy -- web
 
 # 5. Populate secrets in Secret Manager
-gcloud secrets versions add api-prod-DB_URL --data-file=- <<< "postgresql://postgres:pass@INTERNAL_IP:5432/elysia_prod"
+gcloud secrets versions add api-prod-DB_URL --data-file=- <<< "postgresql://postgres:pass@INTERNAL_IP:5432/servio_prod"
 gcloud secrets versions add api-prod-REDIS_URL --data-file=- <<< "redis://INTERNAL_IP:6379"
 # ... repeat for all secrets per environment
 

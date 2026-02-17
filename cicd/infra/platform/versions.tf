@@ -12,7 +12,7 @@ terraform {
   }
 
   backend "gcs" {
-    bucket = "elysia-terraform-state"
+    # bucket name is set via -backend-config in init script or mise
     prefix = "platform"
   }
 }

@@ -10,7 +10,7 @@ interface Props {
 
 export const PreviewProps: Props = {
   name: "Prios",
-  verificationUrl: "https://elysia.dev/verify?token=example-token",
+  verificationUrl: "https://servio.dev/verify?token=example-token",
 };
 
 export default function WelcomeEmail({ name, verificationUrl }: EmailTemplatePropsMap[EmailTemplate.WELCOME]) {

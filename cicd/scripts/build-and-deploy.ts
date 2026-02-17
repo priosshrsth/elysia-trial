@@ -21,7 +21,7 @@ if (env === "preview" && !previewId) {
 
 const PROJECT_ID = getProjectId();
 const REGION = getRegion();
-const AR_REPO = `${REGION}-docker.pkg.dev/${PROJECT_ID}/elysia`;
+const AR_REPO = `${REGION}-docker.pkg.dev/${PROJECT_ID}/servio`;
 const serviceName = env === "preview" ? `${app}-preview-${previewId}` : `${app}-${env}`;
 const imageTag = `${AR_REPO}/${app}:${serviceName}`;
 

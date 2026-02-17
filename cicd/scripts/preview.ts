@@ -26,11 +26,11 @@ if (action === "create") {
 
   // Create preview database on shared VM
   console.log("\nCreating preview database...");
-  await $`gcloud compute ssh elysia-db \
+  await $`gcloud compute ssh servio-db \
     --zone ${ZONE} \
     --tunnel-through-iap \
     --project ${PROJECT_ID} \
-    --command ${`docker exec postgres psql -U postgres -c 'CREATE DATABASE elysia_preview_${previewId};'`}`.nothrow();
+    --command ${`docker exec postgres psql -U postgres -c 'CREATE DATABASE servio_preview_${previewId};'`}`.nothrow();
 
   console.log("\nPreview database created. Now deploy services:");
   console.log(`  bun run deploy:api preview ${previewId}`);
@@ -49,15 +49,15 @@ if (action === "destroy") {
 
   // Drop database
   console.log("\nDropping preview database...");
-  await $`gcloud compute ssh elysia-db \
+  await $`gcloud compute ssh servio-db \
     --zone ${ZONE} \
     --tunnel-through-iap \
     --project ${PROJECT_ID} \
-    --command ${`docker exec postgres psql -U postgres -c 'DROP DATABASE IF EXISTS elysia_preview_${previewId};'`}`.nothrow();
+    --command ${`docker exec postgres psql -U postgres -c 'DROP DATABASE IF EXISTS servio_preview_${previewId};'`}`.nothrow();
 
   // Clean up images
   console.log("\nCleaning up images...");
-  const AR_REPO = `${REGION}-docker.pkg.dev/${PROJECT_ID}/elysia`;
+  const AR_REPO = `${REGION}-docker.pkg.dev/${PROJECT_ID}/servio`;
   await $`gcloud artifacts docker images delete ${AR_REPO}/api:api-preview-${previewId} --quiet`.nothrow();
   await $`gcloud artifacts docker images delete ${AR_REPO}/web:web-preview-${previewId} --quiet`.nothrow();
 

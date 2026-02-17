@@ -1,9 +1,9 @@
 export const AppInfo = {
   phoneNumber: "+123456789",
-  appName: "Elysia Trial",
-  email: "shrsthprios+support@gmail.com",
-  websiteUrl: "https://www.google.com",
-  appUrl: "https://app.google.com",
+  appName: "Servio",
+  email: "shrsthprios+support@servio.dev",
+  websiteUrl: "https://servio.dev",
+  appUrl: "https://app.servio.dev",
   socials: {
     linkedin: "https://www.linkedin.com/in/anit-shrestha-7b8911112/",
   },

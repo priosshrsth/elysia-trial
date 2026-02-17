@@ -27,7 +27,7 @@ done
 # Create databases for each environment
 IFS=',' read -ra ENVS <<< "$ENVIRONMENTS"
 for env in "${ENVS[@]}"; do
-  docker exec postgres psql -U postgres -c "CREATE DATABASE elysia_${env};" 2>/dev/null || true
+  docker exec postgres psql -U postgres -c "CREATE DATABASE servio_${env};" 2>/dev/null || true
 done
 
 # Run Dragonfly (Redis-compatible)

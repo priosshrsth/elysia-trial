@@ -1,5 +1,5 @@
 {
-  "name": "elysia-trial",
+  "name": "servio",
   "private": true,
   "scripts": {
     "build": "turbo run build",

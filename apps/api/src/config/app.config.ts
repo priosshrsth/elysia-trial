@@ -32,7 +32,7 @@ const env = z.object({
   SMTP_PORT: z.coerce.number(),
   SMTP_USER: isDevelopment ? z.string().optional() : z.string(),
   SMTP_PASS: isDevelopment ? z.string().optional() : z.string(),
-  EMAIL_FROM: z.string().default("noreply@elysia.dev"),
+  EMAIL_FROM: z.string().default("noreply@servio.dev"),
 });
 
 let validatedEnv: z.output<typeof env>;

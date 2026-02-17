@@ -5,10 +5,14 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 6.0"
     }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 6.0"
+    }
   }
 
   backend "gcs" {
-    # bucket name is set via -backend-config
-    prefix = "web"
+    bucket = "terraform-state"
+    prefix = "terraform/state"
   }
 }

@@ -2,7 +2,7 @@
 data "terraform_remote_state" "platform" {
   backend = "gcs"
   config = {
-    bucket = "elysia-terraform-state"
+    bucket = var.tf_state_bucket
     prefix = "platform"
   }
 }

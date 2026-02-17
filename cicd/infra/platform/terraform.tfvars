@@ -6,5 +6,5 @@ environments = ["prod", "staging"]
 # TF_VAR_project_id       = "your-gcp-project-id"
 # TF_VAR_billing_account  = "XXXXXX-XXXXXX-XXXXXX"
 # TF_VAR_github_org       = "your-github-org"
-# TF_VAR_github_repo      = "elysia"
+# TF_VAR_github_repo      = "servio"
 # TF_VAR_db_password      = "your-secure-password"

@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "@servio/api",
   "version": "1.0.50",
   "type": "module",
   "scripts": {

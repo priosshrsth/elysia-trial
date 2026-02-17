@@ -5,7 +5,7 @@ variable "project_id" {
 
 variable "app_name" {
   type    = string
-  default = "elysia"
+  default     = "servio"
 }
 
 variable "region" {

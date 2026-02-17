@@ -7,7 +7,7 @@ import { infraDir } from "./lib/paths";
 
 const PROJECT_ID = getProjectId();
 const REGION = getRegion();
-const BUCKET = "elysia-terraform-state";
+const BUCKET = `${PROJECT_ID}-terraform-state`;
 
 console.log(`Bootstrapping infrastructure for project: ${PROJECT_ID}\n`);
 
@@ -34,14 +34,19 @@ const apis = [
   "billingbudgets.googleapis.com",
   "vpcaccess.googleapis.com",
 ];
-await $`gcloud services enable ${apis.join(" ")} --project=${PROJECT_ID}`;
+
+for (const api of apis) {
+  console.log(`Enabling API: ${api}...`);
+  await $`gcloud services enable ${api} --project=${PROJECT_ID}`;
+  console.log(`API ${api} enabled successfully`);
+}
 
 // 3. Initialize all Terraform layers
 const layers = ["platform", "api", "web"];
 for (const layer of layers) {
   console.log(`\n3. Initializing Terraform: ${layer}...`);
   process.chdir(join(infraDir, layer));
-  await $`terraform init`;
+  await $`terraform init -backend-config="bucket=${BUCKET}"`;
 }
 
 console.log("\n--- Bootstrap complete ---");
