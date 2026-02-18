@@ -35,7 +35,7 @@ resource "google_compute_instance" "db" {
 
   metadata = {
     db-password  = var.db_password
-    environments = join(",", var.environments)
+    environment = var.environment
   }
 
   metadata_startup_script = file("${path.module}/startup.sh")

@@ -1,8 +1,9 @@
 resource "google_cloud_run_v2_service" "service" {
-  name     = "${var.app_name}-${var.environment}"
-  project  = var.project_id
-  location = var.region
-  ingress  = "INGRESS_TRAFFIC_ALL"
+  name                = "${var.app_name}-${var.environment}"
+  project             = var.project_id
+  location            = var.region
+  ingress             = "INGRESS_TRAFFIC_ALL"
+  deletion_protection = false
 
   template {
     service_account = var.service_account
@@ -31,19 +32,16 @@ resource "google_cloud_run_v2_service" "service" {
         }
         cpu_idle = true
       }
-
-      env {
-        name  = "NODE_ENV"
-        value = var.environment == "prod" ? "production" : var.environment
-      }
     }
   }
 
-  # Image and env vars are managed by CI/CD, not Terraform
+  # image and env/secrets are managed by CI/CD via gcloud run deploy
   lifecycle {
     ignore_changes = [
       template[0].containers[0].image,
       template[0].containers[0].env,
+      template[0].containers[0].volume_mounts,
+      template[0].volumes,
     ]
   }
 }

@@ -30,7 +30,4 @@ resource "google_billing_budget" "monthly" {
     spend_basis       = "CURRENT_SPEND"
   }
 
-  all_updates_rule {
-    disable_default_iam_recipients = false
-  }
 }

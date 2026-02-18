@@ -5,7 +5,7 @@ on:
     types: [published]
 
 concurrency:
-  group: deploy-${{ github.event.release.prerelease && 'staging' || 'prod' }}
+  group: deploy-${{ github.event.release.prerelease && 'staging' || 'production' }}
   cancel-in-progress: ${{ github.event.release.prerelease }}
 
 permissions:
@@ -14,10 +14,11 @@ permissions:
 
 env:
   REGION: us-central1
-  AR_REPO: us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/servio
-  ENV: ${{ github.event.release.prerelease && 'staging' || 'prod' }}
-  NODE_ENV: ${{ github.event.release.prerelease && 'staging' || 'production' }}
+  ENV: ${{ github.event.release.prerelease && 'staging' || 'production' }}
   TAG: ${{ github.event.release.tag_name }}
+  GCP_PROJECT_ID: ${{ github.event.release.prerelease && vars.GCP_PROJECT_ID_STAGING || vars.GCP_PROJECT_ID_PRODUCTION }}
+  WIF_PROVIDER: ${{ github.event.release.prerelease && vars.WIF_PROVIDER_STAGING || vars.WIF_PROVIDER_PRODUCTION }}
+  GCP_SA_EMAIL: ${{ github.event.release.prerelease && vars.GCP_SA_EMAIL_STAGING || vars.GCP_SA_EMAIL_PRODUCTION }}
 
 jobs:
   build-deploy-api:
@@ -29,8 +30,8 @@ jobs:
 
       - uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
-          service_account: ${{ vars.GCP_SA_EMAIL }}
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.GCP_SA_EMAIL }}
 
       - uses: google-github-actions/setup-gcloud@v2
 
@@ -44,92 +45,37 @@ jobs:
           file: apps/api/Dockerfile
           push: true
           tags: |
-            ${{ env.AR_REPO }}/api:${{ env.ENV }}-latest
-            ${{ env.AR_REPO }}/api:${{ env.TAG }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/servio/api:${{ env.ENV }}-latest
+            ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/servio/api:${{ env.TAG }}
           cache-from: type=gha,scope=api-${{ env.ENV }}
           cache-to: type=gha,mode=max,scope=api-${{ env.ENV }}
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy api-${{ env.ENV }} \
-            --image ${{ env.AR_REPO }}/api:${{ env.TAG }} \
+            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/servio/api:${{ env.TAG }} \
+            --service-account servio-cloudrun@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
             --region ${{ env.REGION }} \
+            --project ${{ env.GCP_PROJECT_ID }} \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars "NODE_ENV=${{ env.NODE_ENV }},PORT=3001,EMAIL_FROM=noreply@servio.dev" \
+            --set-env-vars "NODE_ENV=${{ env.ENV }},PORT=3001,EMAIL_FROM=noreply@servio.dev" \
             --update-secrets "DB_URL=api-${{ env.ENV }}-DB_URL:latest,REDIS_URL=api-${{ env.ENV }}-REDIS_URL:latest,AUTH_SECRET=api-${{ env.ENV }}-AUTH_SECRET:latest,COOKIE_KEY=api-${{ env.ENV }}-COOKIE_KEY:latest,SMTP_HOST=api-${{ env.ENV }}-SMTP_HOST:latest,SMTP_PORT=api-${{ env.ENV }}-SMTP_PORT:latest,SMTP_USER=api-${{ env.ENV }}-SMTP_USER:latest,SMTP_PASS=api-${{ env.ENV }}-SMTP_PASS:latest" \
             --port 3001 \
             --cpu 1 --memory 512Mi \
-            --min-instances 0 --max-instances ${{ env.ENV == 'prod' && '2' || '1' }} \
+            --min-instances 0 --max-instances ${{ env.ENV == 'production' && '2' || '1' }} \
             --vpc-connector servio-vpc-cx \
             --vpc-egress private-ranges-only
 
       - name: Get service URL
         id: url
         run: |
-          URL=$(gcloud run services describe api-${{ env.ENV }} --region ${{ env.REGION }} --format 'value(status.url)')
+          URL=$(gcloud run services describe api-${{ env.ENV }} --region ${{ env.REGION }} --project ${{ env.GCP_PROJECT_ID }} --format 'value(status.url)')
           echo "url=$URL" >> $GITHUB_OUTPUT
 
-  build-deploy-web:
-    runs-on: ubuntu-latest
-    outputs:
-      url: ${{ steps.url.outputs.url }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
-          service_account: ${{ vars.GCP_SA_EMAIL }}
-
-      - uses: google-github-actions/setup-gcloud@v2
-
-      - run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
-
-      - uses: docker/setup-buildx-action@v3
-
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: apps/web/Dockerfile
-          push: true
-          tags: |
-            ${{ env.AR_REPO }}/web:${{ env.ENV }}-latest
-            ${{ env.AR_REPO }}/web:${{ env.TAG }}
-          cache-from: type=gha,scope=web-${{ env.ENV }}
-          cache-to: type=gha,mode=max,scope=web-${{ env.ENV }}
-
-      - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy web-${{ env.ENV }} \
-            --image ${{ env.AR_REPO }}/web:${{ env.TAG }} \
-            --region ${{ env.REGION }} \
-            --platform managed \
-            --allow-unauthenticated \
-            --set-env-vars "NODE_ENV=${{ env.NODE_ENV }}" \
-            --port 3000 \
-            --cpu 1 --memory 512Mi \
-            --min-instances 0 --max-instances 1
-
-      - name: Get service URL
-        id: url
-        run: |
-          URL=$(gcloud run services describe web-${{ env.ENV }} --region ${{ env.REGION }} --format 'value(status.url)')
-          echo "url=$URL" >> $GITHUB_OUTPUT
-
-  configure:
-    needs: [build-deploy-api, build-deploy-web]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
-          service_account: ${{ vars.GCP_SA_EMAIL }}
-
-      - uses: google-github-actions/setup-gcloud@v2
-
-      - name: Update API with service URLs
+      - name: Configure API with service URL
         run: |
           gcloud run services update api-${{ env.ENV }} \
             --region ${{ env.REGION }} \
-            --update-env-vars "BETTER_AUTH_BASE_URL=${{ needs.build-deploy-api.outputs.url }},TRUSTED_DOMAINS=${{ needs.build-deploy-web.outputs.url }}"
+            --project ${{ env.GCP_PROJECT_ID }} \
+            --update-env-vars "BETTER_AUTH_BASE_URL=${{ steps.url.outputs.url }}"

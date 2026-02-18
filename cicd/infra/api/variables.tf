@@ -2,10 +2,12 @@ variable "project_id" {
   type = string
 }
 
-variable "environments" {
-  type    = list(string)
-  default = ["prod", "staging"]
+variable "environment" {
+  type        = string
+  description = "Environment name (staging or production)"
 }
-variable "tf_state_bucket" {
-  type = string
+
+variable "region" {
+  type    = string
+  default = "us-central1"
 }

@@ -18,14 +18,6 @@ variable "image" {
   type = string
 }
 
-variable "vpc_connector_id" {
-  type = string
-}
-
-variable "service_account" {
-  type = string
-}
-
 variable "port" {
   type = number
 }
@@ -48,4 +40,14 @@ variable "cpu" {
 variable "memory" {
   type    = string
   default = "512Mi"
+}
+
+variable "service_account" {
+  type        = string
+  description = "Service account email for the Cloud Run service"
+}
+
+variable "vpc_connector_id" {
+  type        = string
+  description = "VPC Access connector ID for private network access"
 }

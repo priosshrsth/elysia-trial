@@ -2,7 +2,7 @@
 set -euo pipefail
 
 DB_PASSWORD=$(curl -sf "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db-password" -H "Metadata-Flavor: Google")
-ENVIRONMENTS=$(curl -sf "http://metadata.google.internal/computeMetadata/v1/instance/attributes/environments" -H "Metadata-Flavor: Google")
+ENVIRONMENT=$(curl -sf "http://metadata.google.internal/computeMetadata/v1/instance/attributes/environment" -H "Metadata-Flavor: Google")
 
 # Create persistent data directories
 mkdir -p /mnt/disks/data/postgres /mnt/disks/data/dragonfly
@@ -24,11 +24,8 @@ for i in $(seq 1 30); do
   sleep 2
 done
 
-# Create databases for each environment
-IFS=',' read -ra ENVS <<< "$ENVIRONMENTS"
-for env in "${ENVS[@]}"; do
-  docker exec postgres psql -U postgres -c "CREATE DATABASE servio_${env};" 2>/dev/null || true
-done
+# Create database for this environment
+docker exec postgres psql -U postgres -c "CREATE DATABASE servio_${ENVIRONMENT};" 2>/dev/null || true
 
 # Run Dragonfly (Redis-compatible)
 docker run -d \

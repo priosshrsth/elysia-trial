@@ -70,3 +70,21 @@ resource "google_compute_firewall" "allow_ssh_iap" {
   source_ranges = ["35.235.240.0/20"]
   target_tags   = ["db-server"]
 }
+
+# Private Services Access for Cloud SQL
+resource "google_compute_global_address" "private_ip" {
+  count         = var.enable_private_services_access ? 1 : 0
+  name          = "${var.app_name}-private-ip"
+  project       = var.project_id
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = google_compute_network.vpc.id
+}
+
+resource "google_service_networking_connection" "private_vpc" {
+  count                   = var.enable_private_services_access ? 1 : 0
+  network                 = google_compute_network.vpc.id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_ip[0].name]
+}

@@ -6,8 +6,8 @@ variable "app_name" {
   type = string
 }
 
-variable "environments" {
-  type = list(string)
+variable "environment" {
+  type = string
 }
 
 variable "secret_names" {

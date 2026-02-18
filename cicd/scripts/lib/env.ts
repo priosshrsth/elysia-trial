@@ -1,8 +1,8 @@
 /** biome-ignore-all lint/style/noProcessEnv: <allow process.env> */
 
-export type Environment = "prod" | "staging" | "preview";
+export type Environment = "staging" | "production";
 
-const VALID_ENVS = new Set<string>(["prod", "staging", "preview"]);
+const VALID_ENVS = new Set<string>(["staging", "production"]);
 
 export function resolveEnv(input: string | undefined): Environment {
   if (!(input && VALID_ENVS.has(input))) {

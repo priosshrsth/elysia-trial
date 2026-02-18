@@ -1,49 +1,45 @@
-# Read shared platform state
-data "terraform_remote_state" "platform" {
-  backend = "gcs"
-  config = {
-    bucket = var.tf_state_bucket
-    prefix = "platform"
-  }
-}
-
 locals {
-  platform = data.terraform_remote_state.platform.outputs
+  artifact_registry_url = "${var.region}-docker.pkg.dev/${var.project_id}/servio"
 }
 
 provider "google" {
   project = var.project_id
-  region  = local.platform.region
+  region  = var.region
 }
 
-# Cloud Run service per environment
+data "terraform_remote_state" "platform" {
+  backend = "gcs"
+  config = {
+    bucket = "${var.project_id}-terraform-state"
+    prefix = "platform"
+  }
+}
+
+# Cloud Run service
 module "cloud_run" {
-  source   = "../modules/cloud-run"
-  for_each = toset(var.environments)
-
-  project_id       = var.project_id
-  region           = local.platform.region
-  app_name         = "api"
-  environment      = each.key
-  image            = "${local.platform.artifact_registry_url}/api:${each.key}-latest"
-  vpc_connector_id = local.platform.vpc_connector_id
-  service_account  = local.platform.cloud_run_sa_email
-  port             = 3001
-  min_instances    = 0
-  max_instances    = each.key == "prod" ? 2 : 1
-  cpu              = "1"
-  memory           = "512Mi"
+  source              = "../modules/cloud-run"
+  project_id          = var.project_id
+  region              = var.region
+  app_name            = "api"
+  environment         = var.environment
+  # Placeholder for initial creation — CI/CD (deploy.yml) manages the actual image via gcloud run deploy
+  image               = "us-docker.pkg.dev/cloudrun/container/hello:latest"
+  port                = 3001
+  min_instances       = 0
+  max_instances       = var.environment == "production" ? 2 : 1
+  cpu                 = "1"
+  memory              = "512Mi"
+  service_account     = data.terraform_remote_state.platform.outputs.cloud_run_sa_email
+  vpc_connector_id    = data.terraform_remote_state.platform.outputs.vpc_connector_id
 }
 
-# API secrets per environment
+# API secrets
 module "secrets" {
-  source       = "../modules/secrets"
-  project_id   = var.project_id
-  app_name     = "api"
-  environments = var.environments
+  source      = "../modules/secrets"
+  project_id  = var.project_id
+  app_name    = "api"
+  environment = var.environment
   secret_names = [
-    "DB_URL",
-    "REDIS_URL",
     "AUTH_SECRET",
     "COOKIE_KEY",
     "SMTP_HOST",

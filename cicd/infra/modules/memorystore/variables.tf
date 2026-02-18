@@ -10,7 +10,11 @@ variable "app_name" {
   type = string
 }
 
-variable "enable_private_services_access" {
-  type    = bool
-  default = false
+variable "network_id" {
+  type = string
+}
+
+variable "memory_size_gb" {
+  type    = number
+  default = 1
 }

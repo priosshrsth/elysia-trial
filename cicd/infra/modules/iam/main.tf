@@ -54,6 +54,16 @@ resource "google_service_account_iam_member" "github_wif" {
   member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${var.github_org}/${var.github_repo}"
 }
 
+# Allow the Terraform deployer to act as any SA in the project
+# (needed to create Cloud Run services that specify a service account)
+data "google_client_openid_userinfo" "me" {}
+
+resource "google_project_iam_member" "deployer_act_as_sa" {
+  project = var.project_id
+  role    = "roles/iam.serviceAccountUser"
+  member  = "user:${data.google_client_openid_userinfo.me.email}"
+}
+
 # Permissions for GitHub Actions SA
 resource "google_project_iam_member" "github_actions_roles" {
   for_each = toset([

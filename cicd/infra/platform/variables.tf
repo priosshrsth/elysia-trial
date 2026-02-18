@@ -1,11 +1,11 @@
 variable "project_id" {
   type        = string
-  description = "GCP project ID (single project for all environments)"
+  description = "GCP project ID for this environment"
 }
 
 variable "app_name" {
   type    = string
-  default     = "servio"
+  default = "servio"
 }
 
 variable "region" {
@@ -13,35 +13,21 @@ variable "region" {
   default = "us-central1"
 }
 
-variable "billing_account" {
-  type      = string
-  sensitive = true
-}
-
-variable "budget_amount" {
-  type        = number
-  default     = 50
-  description = "Monthly budget in USD"
-}
-
-variable "budget_alert_emails" {
-  type    = list(string)
-  default = []
+variable "environment" {
+  type        = string
+  description = "Environment name (staging or production)"
 }
 
 variable "github_org" {
   type        = string
+  default     = "your-github-org"
   description = "GitHub org or username"
 }
 
 variable "github_repo" {
   type        = string
+  default     = "servio"
   description = "GitHub repository name (without org)"
-}
-
-variable "db_password" {
-  type      = string
-  sensitive = true
 }
 
 variable "vm_machine_type" {
@@ -49,7 +35,24 @@ variable "vm_machine_type" {
   default = "e2-micro"
 }
 
-variable "environments" {
-  type    = list(string)
-  default = ["prod", "staging"]
+variable "use_managed_db" {
+  type        = bool
+  default     = false
+  description = "Use Cloud SQL instead of VM-hosted PostgreSQL"
+}
+
+variable "use_managed_redis" {
+  type        = bool
+  default     = false
+  description = "Use Memorystore Redis instead of VM-hosted Dragonfly"
+}
+
+variable "cloud_sql_tier" {
+  type    = string
+  default = "db-f1-micro"
+}
+
+variable "redis_memory_size" {
+  type    = number
+  default = 1
 }

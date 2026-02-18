@@ -5,3 +5,4 @@
 /**/.terraform.lock.hcl
 /**/.terraform.tfstate.lock.info
 /**/secrets.tfvars
+/**/common.tfvars

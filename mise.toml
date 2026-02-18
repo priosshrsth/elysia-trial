@@ -50,13 +50,13 @@ gcloud compute ssh servio-db \
 """
 
 [tasks."db:migrate:remote"]
-description = "Run migrations against remote DB (usage: mise run db:migrate:remote -- <prod|staging>)"
+description = "Run migrations against remote DB (usage: mise run db:migrate:remote -- <staging|production>)"
 dir = "apps/api"
 run = """
 bash -eo pipefail -c '
   ENV="{{arg(name="env")}}"
-  if [ "$ENV" != "prod" ] && [ "$ENV" != "staging" ]; then
-    echo "Usage: mise run db:migrate:remote -- <prod|staging>"
+  if [ "$ENV" != "staging" ] && [ "$ENV" != "production" ]; then
+    echo "Usage: mise run db:migrate:remote -- <staging|production>"
     exit 1
   fi
   DB_NAME="servio_${ENV}"
@@ -80,48 +80,27 @@ bash -eo pipefail -c '
 # ---------- Infrastructure ----------
 
 [tasks."infra:init"]
-description = "Bootstrap GCS bucket, enable APIs, and init Terraform"
-run = "bun run cicd/scripts/init.ts"
+description = "Bootstrap GCS bucket, enable APIs, and init Terraform (usage: mise run infra:init -- <staging|production>)"
+run = "bun run cicd/scripts/init.ts {{arg(name=\"env\")}}"
 
 [tasks."infra:plan"]
-description = "Terraform plan for a layer (usage: mise run infra:plan -- <platform|api|web>)"
-run = "bun run cicd/scripts/infra.ts plan {{arg(name=\"layer\")}}"
+description = "Terraform plan for a layer (usage: mise run infra:plan -- <platform|api> <staging|production>)"
+run = "bun run cicd/scripts/infra.ts plan {{arg(name=\"layer\")}} {{arg(name=\"env\")}}"
 
 [tasks."infra:deploy"]
-description = "Terraform apply for a layer (usage: mise run infra:deploy -- <platform|api|web>)"
-run = "bun run cicd/scripts/infra.ts apply {{arg(name=\"layer\")}}"
+description = "Terraform apply for a layer (usage: mise run infra:deploy -- <platform|api> <staging|production>)"
+run = "bun run cicd/scripts/infra.ts apply {{arg(name=\"layer\")}} {{arg(name=\"env\")}}"
 
 [tasks."infra:destroy"]
-description = "Terraform destroy for a layer (usage: mise run infra:destroy -- <platform|api|web>)"
-run = "bun run cicd/scripts/infra.ts destroy {{arg(name=\"layer\")}}"
-
-[tasks."infra:all"]
-description = "Deploy all layers in order: platform -> api -> web"
-depends = ["infra:deploy -- platform", "infra:deploy -- api", "infra:deploy -- web"]
+description = "Terraform destroy for a layer (usage: mise run infra:destroy -- <platform|api> <staging|production>)"
+run = "bun run cicd/scripts/infra.ts destroy {{arg(name=\"layer\")}} {{arg(name=\"env\")}}"
 
 # ---------- Deploy ----------
 
+[tasks.deploy]
+description = "Full deploy: platform infra + API infra + populate DB/Redis secrets + build & push image + Cloud Run deploy (usage: mise run deploy -- <staging|production>)"
+run = "bun run cicd/scripts/deploy.ts {{arg(name=\"env\")}}"
+
 [tasks."deploy:api"]
-description = "Build and deploy API to Cloud Run (usage: mise run deploy:api -- <prod|staging|preview> [previewId])"
-run = "bun run cicd/scripts/build-and-deploy.ts api {{arg(name=\"env\")}} {{arg(name=\"previewId\", default=\"\")}}"
-
-[tasks."deploy:web"]
-description = "Build and deploy Web to Cloud Run (usage: mise run deploy:web -- <prod|staging|preview> [previewId])"
-run = "bun run cicd/scripts/build-and-deploy.ts web {{arg(name=\"env\")}} {{arg(name=\"previewId\", default=\"\")}}"
-
-[tasks."deploy:all"]
-description = "Deploy both API and Web to prod"
-run = """
-bun run cicd/scripts/build-and-deploy.ts api prod
-bun run cicd/scripts/build-and-deploy.ts web prod
-"""
-
-# ---------- Preview ----------
-
-[tasks."preview:create"]
-description = "Create a preview environment (usage: mise run preview:create -- <previewId>)"
-run = "bun run cicd/scripts/preview.ts create {{arg(name=\"previewId\")}}"
-
-[tasks."preview:destroy"]
-description = "Destroy a preview environment (usage: mise run preview:destroy -- <previewId>)"
-run = "bun run cicd/scripts/preview.ts destroy {{arg(name=\"previewId\")}}"
+description = "Build and deploy API to Cloud Run only (usage: mise run deploy:api -- <staging|production>)"
+run = "bun run cicd/scripts/build-and-deploy.ts {{arg(name=\"env\")}}"
