@@ -1,8 +1,8 @@
 /** biome-ignore-all lint/style/noProcessEnv: <allow process.env> */
 
 import { $ } from "bun";
-import { getProjectId, getRegion, resolveEnv } from "./lib/env";
-import { rootDir } from "./lib/paths";
+import { getProjectId, getRegion, resolveEnv } from "../../modules/scripts/env";
+import { rootDir } from "../../modules/scripts/paths";
 
 const args = process.argv.slice(2);
 const env = resolveEnv(args[0]);

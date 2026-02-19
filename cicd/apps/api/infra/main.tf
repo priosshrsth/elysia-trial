@@ -17,7 +17,7 @@ data "terraform_remote_state" "platform" {
 
 # Cloud Run service
 module "cloud_run" {
-  source              = "../modules/cloud-run"
+  source              = "../../../modules/gcp/cloud-run"
   project_id          = var.project_id
   region              = var.region
   app_name            = "api"
@@ -35,7 +35,7 @@ module "cloud_run" {
 
 # API secrets
 module "secrets" {
-  source      = "../modules/secrets"
+  source      = "../../../modules/gcp/secrets"
   project_id  = var.project_id
   app_name    = "api"
   environment = var.environment

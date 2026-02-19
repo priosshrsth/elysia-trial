@@ -13,15 +13,30 @@ locals {
   db_host    = var.use_managed_db ? module.cloud_sql[0].private_ip_address : module.compute[0].db_internal_ip
   redis_host = var.use_managed_redis ? module.memorystore[0].host : module.compute[0].db_internal_ip
   redis_port = var.use_managed_redis ? module.memorystore[0].port : 6379
-  db_url     = "postgresql://postgres:${data.google_secret_manager_secret_version.db_password.secret_data}@${local.db_host}:5432/servio_${var.environment}"
+  db_url     = "postgresql://postgres:${random_password.db_password.result}@${local.db_host}:5432/servio_${var.environment}"
   redis_url  = "redis://${local.redis_host}:${local.redis_port}"
 }
 
-# Read secrets from Secret Manager (created once during infra:init)
-data "google_secret_manager_secret_version" "db_password" {
-  secret     = "DB_PASSWORD"
-  project    = var.project_id
+# Generate DB password once — stable in tfstate, never regenerated unless explicitly replaced
+resource "random_password" "db_password" {
+  length  = 32
+  special = false
+}
+
+resource "google_secret_manager_secret" "db_password" {
+  project   = var.project_id
+  secret_id = "DB_PASSWORD"
+  replication { auto {} }
   depends_on = [google_project_service.apis]
+}
+
+resource "google_secret_manager_secret_version" "db_password" {
+  secret      = google_secret_manager_secret.db_password.id
+  secret_data = random_password.db_password.result
+
+  lifecycle {
+    ignore_changes = [secret_data]
+  }
 }
 
 # Enable required GCP APIs
@@ -45,7 +60,7 @@ resource "google_project_service" "apis" {
 }
 
 module "networking" {
-  source                         = "../modules/networking"
+  source                         = "../../modules/gcp/networking"
   project_id                     = var.project_id
   region                         = var.region
   app_name                       = var.app_name
@@ -54,7 +69,7 @@ module "networking" {
 }
 
 module "artifact_registry" {
-  source     = "../modules/artifact-registry"
+  source     = "../../modules/gcp/artifact-registry"
   project_id = var.project_id
   region     = var.region
   app_name   = var.app_name
@@ -64,7 +79,7 @@ module "artifact_registry" {
 # VM-based DB + Redis (staging)
 module "compute" {
   count        = var.use_managed_db ? 0 : 1
-  source       = "../modules/compute"
+  source       = "../../modules/gcp/compute"
   project_id   = var.project_id
   region       = var.region
   zone         = local.zone
@@ -72,7 +87,7 @@ module "compute" {
   machine_type = var.vm_machine_type
   network_id   = module.networking.network_id
   subnet_id    = module.networking.subnet_id
-  db_password  = data.google_secret_manager_secret_version.db_password.secret_data
+  db_password  = random_password.db_password.result
   environment  = var.environment
   depends_on   = [google_project_service.apis]
 }
@@ -80,21 +95,21 @@ module "compute" {
 # Cloud SQL PostgreSQL (production)
 module "cloud_sql" {
   count       = var.use_managed_db ? 1 : 0
-  source      = "../modules/cloud-sql"
+  source      = "../../modules/gcp/cloud-sql"
   project_id  = var.project_id
   region      = var.region
   app_name    = var.app_name
   environment = var.environment
   tier        = var.cloud_sql_tier
   network_id  = module.networking.network_id
-  db_password = data.google_secret_manager_secret_version.db_password.secret_data
+  db_password = random_password.db_password.result
   depends_on  = [google_project_service.apis, module.networking]
 }
 
 # Memorystore Redis (production)
 module "memorystore" {
   count          = var.use_managed_redis ? 1 : 0
-  source         = "../modules/memorystore"
+  source         = "../../modules/gcp/memorystore"
   project_id     = var.project_id
   region         = var.region
   app_name       = var.app_name
@@ -104,7 +119,7 @@ module "memorystore" {
 }
 
 module "iam" {
-  source      = "../modules/iam"
+  source      = "../../modules/gcp/iam"
   project_id  = var.project_id
   app_name    = var.app_name
   github_org  = var.github_org

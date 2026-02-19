@@ -79,28 +79,34 @@ bash -eo pipefail -c '
 
 # ---------- Infrastructure ----------
 
-[tasks."infra:init"]
-description = "Bootstrap GCS bucket, enable APIs, and init Terraform (usage: mise run infra:init -- <staging|production>)"
-run = "bun run cicd/scripts/init.ts {{arg(name=\"env\")}}"
+[tasks.init]
+description = "Bootstrap: GCS state bucket, enable APIs, create secrets, init Terraform"
+run = "bun run cicd/init.ts {{arg(name=\"env\")}}"
 
-[tasks."infra:plan"]
-description = "Terraform plan for a layer (usage: mise run infra:plan -- <platform|api> <staging|production>)"
-run = "bun run cicd/scripts/infra.ts plan {{arg(name=\"layer\")}} {{arg(name=\"env\")}}"
+[tasks."platform:plan"]
+run = "bun run cicd/platform/index.ts plan {{arg(name=\"env\")}}"
 
-[tasks."infra:deploy"]
-description = "Terraform apply for a layer (usage: mise run infra:deploy -- <platform|api> <staging|production>)"
-run = "bun run cicd/scripts/infra.ts apply {{arg(name=\"layer\")}} {{arg(name=\"env\")}}"
+[tasks."platform:up"]
+run = "bun run cicd/platform/index.ts up {{arg(name=\"env\")}}"
 
-[tasks."infra:destroy"]
-description = "Terraform destroy for a layer (usage: mise run infra:destroy -- <platform|api> <staging|production>)"
-run = "bun run cicd/scripts/infra.ts destroy {{arg(name=\"layer\")}} {{arg(name=\"env\")}}"
+[tasks."platform:down"]
+run = "bun run cicd/platform/index.ts down {{arg(name=\"env\")}}"
+
+[tasks."api:plan"]
+run = "bun run cicd/apps/api/index.ts plan {{arg(name=\"env\")}}"
+
+[tasks."api:up"]
+run = "bun run cicd/apps/api/index.ts up {{arg(name=\"env\")}}"
+
+[tasks."api:down"]
+run = "bun run cicd/apps/api/index.ts down {{arg(name=\"env\")}}"
+
+[tasks."api:release"]
+description = "Build, push image and deploy to Cloud Run"
+run = "bun run cicd/apps/api/release.ts {{arg(name=\"env\")}}"
 
 # ---------- Deploy ----------
 
 [tasks.deploy]
-description = "Full deploy: platform infra + API infra + populate DB/Redis secrets + build & push image + Cloud Run deploy (usage: mise run deploy -- <staging|production>)"
-run = "bun run cicd/scripts/deploy.ts {{arg(name=\"env\")}}"
-
-[tasks."deploy:api"]
-description = "Build and deploy API to Cloud Run only (usage: mise run deploy:api -- <staging|production>)"
-run = "bun run cicd/scripts/build-and-deploy.ts {{arg(name=\"env\")}}"
+description = "Full deploy: platform up + api up + api release"
+run = "bun run cicd/deploy.ts {{arg(name=\"env\")}}"

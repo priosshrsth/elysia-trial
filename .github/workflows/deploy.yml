@@ -54,18 +54,15 @@ jobs:
         run: |
           gcloud run deploy api-${{ env.ENV }} \
             --image ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/servio/api:${{ env.TAG }} \
-            --service-account servio-cloudrun@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
             --region ${{ env.REGION }} \
             --project ${{ env.GCP_PROJECT_ID }} \
             --platform managed \
             --allow-unauthenticated \
             --set-env-vars "NODE_ENV=${{ env.ENV }},PORT=3001,EMAIL_FROM=noreply@servio.dev" \
-            --update-secrets "DB_URL=api-${{ env.ENV }}-DB_URL:latest,REDIS_URL=api-${{ env.ENV }}-REDIS_URL:latest,AUTH_SECRET=api-${{ env.ENV }}-AUTH_SECRET:latest,COOKIE_KEY=api-${{ env.ENV }}-COOKIE_KEY:latest,SMTP_HOST=api-${{ env.ENV }}-SMTP_HOST:latest,SMTP_PORT=api-${{ env.ENV }}-SMTP_PORT:latest,SMTP_USER=api-${{ env.ENV }}-SMTP_USER:latest,SMTP_PASS=api-${{ env.ENV }}-SMTP_PASS:latest" \
+            --update-secrets "DB_URL=DB_URL:latest,REDIS_URL=REDIS_URL:latest,AUTH_SECRET=AUTH_SECRET:latest,COOKIE_KEY=COOKIE_KEY:latest,SMTP_HOST=SMTP_HOST:latest,SMTP_PORT=SMTP_PORT:latest,SMTP_USER=SMTP_USER:latest,SMTP_PASS=SMTP_PASS:latest" \
             --port 3001 \
             --cpu 1 --memory 512Mi \
-            --min-instances 0 --max-instances ${{ env.ENV == 'production' && '2' || '1' }} \
-            --vpc-connector servio-vpc-cx \
-            --vpc-egress private-ranges-only
+            --min-instances 0 --max-instances ${{ env.ENV == 'production' && '2' || '1' }}
 
       - name: Get service URL
         id: url
