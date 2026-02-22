@@ -1,6 +1,6 @@
 # ---- Prune ----
 FROM oven/bun:1.3-alpine AS prune
-RUN bun add -g turbo
+RUN bun add -g turbo@2.8.9
 WORKDIR /app
 COPY . .
 RUN turbo prune @servio/api --docker
