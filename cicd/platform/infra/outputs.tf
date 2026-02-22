@@ -19,15 +19,15 @@ output "artifact_registry_url" {
 }
 
 output "db_host" {
-  value = var.use_managed_db ? module.cloud_sql[0].private_ip_address : module.compute[0].db_internal_ip
+  value = module.cloud_sql.private_ip_address
 }
 
 output "redis_host" {
-  value = var.use_managed_redis ? module.memorystore[0].host : module.compute[0].db_internal_ip
+  value = module.memorystore.host
 }
 
 output "redis_port" {
-  value = var.use_managed_redis ? module.memorystore[0].port : 6379
+  value = module.memorystore.port
 }
 
 output "vpc_connector_id" {

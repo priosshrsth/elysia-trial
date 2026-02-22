@@ -25,6 +25,4 @@ export function getProjectId(): string {
   return requireEnvVar("GCP_PROJECT_ID");
 }
 
-export function getRegion(): string {
-  return process.env.GCP_REGION || "us-central1";
-}
+export const REGION = "us-central1";

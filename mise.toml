@@ -105,6 +105,10 @@ run = "bun run cicd/apps/api/index.ts down {{arg(name=\"env\")}}"
 description = "Build, push image and deploy to Cloud Run"
 run = "bun run cicd/apps/api/release.ts {{arg(name=\"env\")}}"
 
+[tasks."setup-github-vars"]
+description = "Sync platform Terraform outputs to GitHub Actions repo variables"
+run = "bun run cicd/setup-github-vars.ts {{arg(name=\"env\")}}"
+
 # ---------- Deploy ----------
 
 [tasks.deploy]

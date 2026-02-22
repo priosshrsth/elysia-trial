@@ -67,4 +67,5 @@ console.log(`Project: ${PROJECT_ID} | Environment: ${env}`);
 console.log("\nNext steps:");
 console.log(`  1. mise run platform:plan -- ${env}`);
 console.log(`  2. mise run platform:up -- ${env}`);
-console.log(`  3. mise run api:up -- ${env}`);
+console.log(`  3. GCP_PROJECT_ID=${PROJECT_ID} bun cicd/setup-github-vars.ts ${env}`);
+console.log(`  4. mise run api:up -- ${env}`);

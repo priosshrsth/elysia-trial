@@ -207,6 +207,18 @@ Best practices:
 
 ---
 
+## Background Jobs
+
+Jobs are dispatched via BullMQ in production and run synchronously in development — no Redis needed locally.
+
+Adding a new job:
+1. Create `src/jobs/my-job.job.ts` using `defineJob<T>()`
+2. Add it to `src/jobs/registry.ts`
+
+The worker picks it up automatically. See [docs/jobs.md](docs/jobs.md) for the full pattern, type details, and worker setup.
+
+---
+
 ## Design Philosophy
 
 - Explicit over implicit

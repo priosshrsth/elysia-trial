@@ -11,5 +11,5 @@ output "vpc_connector_id" {
 }
 
 output "private_vpc_connection" {
-  value = var.enable_private_services_access ? google_service_networking_connection.private_vpc[0].id : null
+  value = google_service_networking_connection.private_vpc.id
 }

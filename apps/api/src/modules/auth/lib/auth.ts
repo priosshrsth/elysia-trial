@@ -19,13 +19,13 @@ export const auth = betterAuth({
   emailVerification: {
     autoSignInAfterVerification: true,
     sendVerificationEmail(data, _request) {
-      return emailService.sendEmail({
-        template: EmailTemplate.WELCOME,
+      return emailService.enqueue({
         to: data.user.email,
         subject: "Verify your email address",
+        template: EmailTemplate.WELCOME,
         props: {
-          verificationUrl: data.url,
           name: data.user.name,
+          verificationUrl: data.url,
         },
       });
     },

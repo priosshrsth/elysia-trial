@@ -4,7 +4,7 @@ import { EmailTemplate } from "types";
 async function testEmail() {
   console.log("Testing email sending...");
   try {
-    const info = await emailService.sendEmail({
+    await emailService.enqueue({
       to: "test@example.com",
       subject: "Test Welcome Email",
       template: EmailTemplate.WELCOME,
@@ -13,10 +13,9 @@ async function testEmail() {
         verificationUrl: "https://example.com/verify",
       },
     });
-    console.log("Email sent successfully!");
-    console.log("Message ID:", info.messageId);
+    console.log("Email enqueued successfully!");
   } catch (error) {
-    console.error("Failed to send email:", error);
+    console.error("Failed to enqueue email:", error);
   }
 }
 

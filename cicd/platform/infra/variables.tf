@@ -20,31 +20,14 @@ variable "environment" {
 
 variable "github_org" {
   type        = string
-  default     = "your-github-org"
+  default     = "priosshrsth"
   description = "GitHub org or username"
 }
 
 variable "github_repo" {
   type        = string
-  default     = "servio"
+  default     = "elysia-trial"
   description = "GitHub repository name (without org)"
-}
-
-variable "vm_machine_type" {
-  type    = string
-  default = "e2-micro"
-}
-
-variable "use_managed_db" {
-  type        = bool
-  default     = false
-  description = "Use Cloud SQL instead of VM-hosted PostgreSQL"
-}
-
-variable "use_managed_redis" {
-  type        = bool
-  default     = false
-  description = "Use Memorystore Redis instead of VM-hosted Dragonfly"
 }
 
 variable "cloud_sql_tier" {
