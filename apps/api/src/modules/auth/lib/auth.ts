@@ -1,7 +1,7 @@
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { openAPI } from "better-auth/plugins";
-import { appConfig } from "src/config/app.config";
+import { appConfig, getValidateEnv } from "src/config/app.config";
 import { db } from "src/db";
 import { redis } from "src/lib/redis";
 import { emailService } from "src/modules/emails/email.service";
