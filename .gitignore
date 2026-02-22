@@ -35,6 +35,9 @@ yarn-error.log*
 .DS_Store
 *.pem
 
+# Claude Code local settings (may contain GCP project IDs, registry URLs)
+.claude/settings.local.json
+
 # I have some local script setup for personal stuff for now
 # TODO: remove this
 apps/api/temp

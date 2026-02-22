@@ -2,14 +2,19 @@
 
 import { join } from "node:path";
 import { $ } from "bun";
-import { getProjectId, getRegion, resolveEnv } from "./modules/scripts/env";
+import { getProjectId, resolveEnv } from "./modules/scripts/env";
 import { cicdDir } from "./modules/scripts/paths";
 
 const args = process.argv.slice(2);
 const env = resolveEnv(args[0]);
 
 const PROJECT_ID = getProjectId();
-const REGION = getRegion();
+// biome-ignore lint/suspicious/noAlert: CLI script — prompt() is intentional for interactive terminal input
+const REGION = process.env.GCP_REGION ?? prompt("Enter GCP region (e.g. europe-west1):");
+if (!REGION) {
+  console.error("GCP region is required");
+  process.exit(1);
+}
 const BUCKET = `${PROJECT_ID}-terraform-state`;
 
 console.log(`Bootstrapping infrastructure for project: ${PROJECT_ID} (env: ${env})\n`);
