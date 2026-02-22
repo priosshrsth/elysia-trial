@@ -67,7 +67,10 @@ export const auth = betterAuth({
     //   credentials: true,
     // },
   },
-  trustedOrigins: getValidateEnv().TRUSTED_DOMAINS,
+  trustedOrigins: (appConfig.TRUSTED_DOMAINS as unknown as string | undefined)
+    ?.split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
   experimental: {
     joins: true,
   },
