@@ -19,5 +19,5 @@
       "bun-types" // add Bun global
     ]
   },
-  "include": ["**/*", ".eslintrc.js", "cicd/scripts/deploy.ts"]
+  "include": ["cicd/**/*", ".eslintrc.js"]
 }

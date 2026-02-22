@@ -2,21 +2,19 @@
 bun = "latest"
 node = "24"
 
+# ---------- Housekeeping ----------
+
 [tasks.cleanup]
 description = "Cleanup node_modules, build outputs and lockfiles"
 run = """
 bash -eo pipefail -c '
-  # Remove all node_modules directories
   find . -type d -name node_modules -prune -exec rm -rf {} +
-
-  # Remove all dist directories
   find . -type d -name dist -prune -exec rm -rf {} +
-
-  # Remove all .next directories
   find . -type d -name .next -prune -exec rm -rf {} +
 '
 """
 
+# ---------- Database ----------
 
 [tasks."gen:migration"]
 description = "Generate migration files"
@@ -27,3 +25,88 @@ run = "bun run migration:generate --name"
 description = "Run migration files"
 dir = "apps/api"
 run = "bun run migration:run"
+
+# ---------- Remote Database ----------
+
+[tasks."ssh:db"]
+description = "SSH into DB VM via IAP tunnel"
+run = """
+gcloud compute ssh servio-db \
+  --zone ${GCP_REGION:-us-central1}-c \
+  --tunnel-through-iap \
+  --project ${GCP_PROJECT_ID:?Set GCP_PROJECT_ID}
+"""
+
+[tasks."db:tunnel"]
+description = "Port-forward local 5433 to remote DB (usage: connect to localhost:5433)"
+run = """
+echo "Tunnel open: postgresql://postgres:<password>@localhost:5433/servio_<env>"
+echo "Press Ctrl+C to close"
+gcloud compute ssh servio-db \
+  --zone ${GCP_REGION:-us-central1}-c \
+  --tunnel-through-iap \
+  --project ${GCP_PROJECT_ID:?Set GCP_PROJECT_ID} \
+  -- -N -L 5433:localhost:5432
+"""
+
+[tasks."db:migrate:remote"]
+description = "Run migrations against remote DB (usage: mise run db:migrate:remote -- <staging|production>)"
+dir = "apps/api"
+run = """
+bash -eo pipefail -c '
+  ENV="{{arg(name="env")}}"
+  if [ "$ENV" != "staging" ] && [ "$ENV" != "production" ]; then
+    echo "Usage: mise run db:migrate:remote -- <staging|production>"
+    exit 1
+  fi
+  DB_NAME="servio_${ENV}"
+  PROJECT=${GCP_PROJECT_ID:?Set GCP_PROJECT_ID}
+  ZONE="${GCP_REGION:-us-central1}-c"
+
+  echo "Starting IAP tunnel to ${DB_NAME}..."
+  gcloud compute ssh servio-db --zone $ZONE --tunnel-through-iap --project $PROJECT -- -N -L 5433:localhost:5432 &
+  TUNNEL_PID=$!
+  sleep 3
+
+  echo "Running migrations on ${DB_NAME}..."
+  DB_URL="postgresql://postgres:${DB_PASSWORD:?Set DB_PASSWORD}@localhost:5433/${DB_NAME}" bun run migration:run
+  EXIT_CODE=$?
+
+  kill $TUNNEL_PID 2>/dev/null || true
+  exit $EXIT_CODE
+'
+"""
+
+# ---------- Infrastructure ----------
+
+[tasks.init]
+description = "Bootstrap: GCS state bucket, enable APIs, create secrets, init Terraform"
+run = "bun run cicd/init.ts {{arg(name=\"env\")}}"
+
+[tasks."platform:plan"]
+run = "bun run cicd/platform/index.ts plan {{arg(name=\"env\")}}"
+
+[tasks."platform:up"]
+run = "bun run cicd/platform/index.ts up {{arg(name=\"env\")}}"
+
+[tasks."platform:down"]
+run = "bun run cicd/platform/index.ts down {{arg(name=\"env\")}}"
+
+[tasks."api:plan"]
+run = "bun run cicd/apps/api/index.ts plan {{arg(name=\"env\")}}"
+
+[tasks."api:up"]
+run = "bun run cicd/apps/api/index.ts up {{arg(name=\"env\")}}"
+
+[tasks."api:down"]
+run = "bun run cicd/apps/api/index.ts down {{arg(name=\"env\")}}"
+
+[tasks."api:release"]
+description = "Build, push image and deploy to Cloud Run"
+run = "bun run cicd/apps/api/release.ts {{arg(name=\"env\")}}"
+
+# ---------- Deploy ----------
+
+[tasks.deploy]
+description = "Full deploy: platform up + api up + api release"
+run = "bun run cicd/deploy.ts {{arg(name=\"env\")}}"

@@ -45,4 +45,4 @@ export const app = new Elysia()
   .get("/favicon.ico", () => Bun.file("src/../public/favicon.ico"))
   .listen(appConfig.PORT);
 
-console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
+console.log(`🦊 Servio API is running at ${app.server?.hostname}:${app.server?.port}`);

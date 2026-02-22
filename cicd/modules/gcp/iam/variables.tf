@@ -1,0 +1,15 @@
+variable "project_id" {
+  type = string
+}
+
+variable "app_name" {
+  type = string
+}
+
+variable "github_org" {
+  type = string
+}
+
+variable "github_repo" {
+  type = string
+}
