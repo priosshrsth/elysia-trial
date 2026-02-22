@@ -19,8 +19,10 @@
     "@repo/emails": "workspace:*",
     "@repo/types": "workspace:*",
     "better-auth": "^1.4.18",
+    "bullmq": "^5.69.3",
     "drizzle-orm": "^0.45.1",
     "elysia": "^1.4.25",
+    "ioredis": "^5.9.3",
     "nodemailer": "^8.0.1",
     "uuid": "^13.0.0",
     "zod": "catalog:lib"

@@ -9,12 +9,8 @@ provider "google-beta" {
 }
 
 locals {
-  zone       = "${var.region}-c"
-  db_host    = var.use_managed_db ? module.cloud_sql[0].private_ip_address : module.compute[0].db_internal_ip
-  redis_host = var.use_managed_redis ? module.memorystore[0].host : module.compute[0].db_internal_ip
-  redis_port = var.use_managed_redis ? module.memorystore[0].port : 6379
-  db_url     = "postgresql://postgres:${random_password.db_password.result}@${local.db_host}:5432/servio_${var.environment}"
-  redis_url  = "redis://${local.redis_host}:${local.redis_port}"
+  db_url    = "postgresql://postgres:${random_password.db_password.result}@${module.cloud_sql.private_ip_address}:5432/servio_${var.environment}"
+  redis_url = "redis://${module.memorystore.host}:${module.memorystore.port}"
 }
 
 # Generate DB password once — stable in tfstate, never regenerated unless explicitly replaced
@@ -26,7 +22,9 @@ resource "random_password" "db_password" {
 resource "google_secret_manager_secret" "db_password" {
   project   = var.project_id
   secret_id = "DB_PASSWORD"
-  replication { auto {} }
+  replication {
+    auto {}
+  }
   depends_on = [google_project_service.apis]
 }
 
@@ -49,7 +47,7 @@ resource "google_project_service" "apis" {
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "cloudresourcemanager.googleapis.com",
-"vpcaccess.googleapis.com",
+    "vpcaccess.googleapis.com",
     "sqladmin.googleapis.com",
     "redis.googleapis.com",
     "servicenetworking.googleapis.com",
@@ -60,12 +58,11 @@ resource "google_project_service" "apis" {
 }
 
 module "networking" {
-  source                         = "../../modules/gcp/networking"
-  project_id                     = var.project_id
-  region                         = var.region
-  app_name                       = var.app_name
-  enable_private_services_access = var.use_managed_db
-  depends_on                     = [google_project_service.apis]
+  source     = "../../modules/gcp/networking"
+  project_id = var.project_id
+  region     = var.region
+  app_name   = var.app_name
+  depends_on = [google_project_service.apis]
 }
 
 module "artifact_registry" {
@@ -76,25 +73,7 @@ module "artifact_registry" {
   depends_on = [google_project_service.apis]
 }
 
-# VM-based DB + Redis (staging)
-module "compute" {
-  count        = var.use_managed_db ? 0 : 1
-  source       = "../../modules/gcp/compute"
-  project_id   = var.project_id
-  region       = var.region
-  zone         = local.zone
-  app_name     = var.app_name
-  machine_type = var.vm_machine_type
-  network_id   = module.networking.network_id
-  subnet_id    = module.networking.subnet_id
-  db_password  = random_password.db_password.result
-  environment  = var.environment
-  depends_on   = [google_project_service.apis]
-}
-
-# Cloud SQL PostgreSQL (production)
 module "cloud_sql" {
-  count       = var.use_managed_db ? 1 : 0
   source      = "../../modules/gcp/cloud-sql"
   project_id  = var.project_id
   region      = var.region
@@ -106,9 +85,7 @@ module "cloud_sql" {
   depends_on  = [google_project_service.apis, module.networking]
 }
 
-# Memorystore Redis (production)
 module "memorystore" {
-  count          = var.use_managed_redis ? 1 : 0
   source         = "../../modules/gcp/memorystore"
   project_id     = var.project_id
   region         = var.region
@@ -131,7 +108,9 @@ module "iam" {
 resource "google_secret_manager_secret" "db_url" {
   project   = var.project_id
   secret_id = "DB_URL"
-  replication { auto {} }
+  replication {
+    auto {}
+  }
   depends_on = [google_project_service.apis]
 }
 
@@ -143,7 +122,9 @@ resource "google_secret_manager_secret_version" "db_url" {
 resource "google_secret_manager_secret" "redis_url" {
   project   = var.project_id
   secret_id = "REDIS_URL"
-  replication { auto {} }
+  replication {
+    auto {}
+  }
   depends_on = [google_project_service.apis]
 }
 
@@ -151,4 +132,3 @@ resource "google_secret_manager_secret_version" "redis_url" {
   secret      = google_secret_manager_secret.redis_url.id
   secret_data = local.redis_url
 }
-

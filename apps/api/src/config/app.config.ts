@@ -4,7 +4,7 @@ const nodeEnv = process.env.NODE_ENV as string;
 
 export const isDevelopment = new Set(["development", "test", "local"]).has(nodeEnv);
 
-const env = z.object({
+const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "staging", "production"]),
   PORT: z.coerce.number<string | number>().min(3000).default(3001),
 
@@ -27,6 +27,9 @@ const env = z.object({
     }),
   ),
 
+  // queue
+  QUEUE_DRIVER: z.enum(["sync", "redis"]).default("sync"),
+
   // smtp
   SMTP_HOST: z.string(),
   SMTP_PORT: z.coerce.number(),
@@ -35,7 +38,7 @@ const env = z.object({
   EMAIL_FROM: z.string().default("noreply@servio.dev"),
 });
 
-let validatedEnv: z.output<typeof env>;
+let validatedEnv: z.output<typeof envSchema>;
 
 export function getValidateEnv() {
   if (validatedEnv) {
@@ -44,8 +47,8 @@ export function getValidateEnv() {
 
   console.log("Validating env..");
 
-  validatedEnv = env.parse(process.env);
+  validatedEnv = envSchema.parse(process.env);
   return validatedEnv;
 }
 
-export const appConfig = { ...process.env } as unknown as z.output<typeof env>;
+export const appConfig = { ...process.env } as unknown as z.output<typeof envSchema>;

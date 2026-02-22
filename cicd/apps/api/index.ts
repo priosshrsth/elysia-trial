@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { resolveEnv } from "../../modules/scripts/env";
+import { cicdDir } from "../../modules/scripts/paths";
 import { runTerraform } from "../../modules/scripts/terraform";
 
 const args = process.argv.slice(2);
@@ -20,5 +21,6 @@ const commandMap: Record<string, "plan" | "apply" | "destroy"> = {
 const env = resolveEnv(envInput);
 const command = commandMap[cmdArg];
 const layerDir = join(import.meta.dir, "infra");
+const varFile = join(cicdDir, "envs", `${env}.tfvars`);
 
-await runTerraform(command, layerDir, env);
+await runTerraform(command, layerDir, env, { varFile });

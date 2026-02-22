@@ -19,7 +19,9 @@ resource "google_cloud_run_v2_service" "service" {
     }
 
     containers {
-      image = var.image
+      image   = var.image
+      command = length(var.command) > 0 ? var.command : null
+      args    = length(var.args) > 0 ? var.args : null
 
       ports {
         container_port = var.port
@@ -32,22 +34,41 @@ resource "google_cloud_run_v2_service" "service" {
         }
         cpu_idle = true
       }
+
+      dynamic "env" {
+        for_each = var.env_vars
+        content {
+          name  = env.key
+          value = env.value
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.secret_env_vars
+        content {
+          name = env.value
+          value_source {
+            secret_key_ref {
+              secret  = env.value
+              version = "latest"
+            }
+          }
+        }
+      }
     }
   }
 
-  # image and env/secrets are managed by CI/CD via gcloud run deploy
+  # Only the image is managed by CI/CD (deploy script); everything else is owned by Terraform
   lifecycle {
     ignore_changes = [
       template[0].containers[0].image,
-      template[0].containers[0].env,
-      template[0].containers[0].volume_mounts,
-      template[0].volumes,
     ]
   }
 }
 
 # Public access
 resource "google_cloud_run_v2_service_iam_member" "public" {
+  count    = var.allow_public_access ? 1 : 0
   project  = var.project_id
   location = var.region
   name     = google_cloud_run_v2_service.service.name

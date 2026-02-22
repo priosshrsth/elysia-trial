@@ -12,7 +12,7 @@ resource "google_compute_subnetwork" "main" {
   ip_cidr_range = "10.0.0.0/24"
 }
 
-# Serverless VPC Access connector — Cloud Run -> VM connectivity
+# Serverless VPC Access connector — Cloud Run -> private VPC connectivity
 resource "google_vpc_access_connector" "connector" {
   name          = "${var.app_name}-vpc-cx"
   project       = var.project_id
@@ -41,39 +41,8 @@ resource "google_compute_router_nat" "nat" {
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
 
-# Allow VPC connector and subnet to reach DB ports
-resource "google_compute_firewall" "allow_internal" {
-  name    = "${var.app_name}-allow-internal"
-  project = var.project_id
-  network = google_compute_network.vpc.id
-
-  allow {
-    protocol = "tcp"
-    ports    = ["5432", "6379"]
-  }
-
-  source_ranges = ["10.8.0.0/28", "10.0.0.0/24"]
-  target_tags   = ["db-server"]
-}
-
-# Allow SSH via IAP only
-resource "google_compute_firewall" "allow_ssh_iap" {
-  name    = "${var.app_name}-allow-ssh-iap"
-  project = var.project_id
-  network = google_compute_network.vpc.id
-
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
-  }
-
-  source_ranges = ["35.235.240.0/20"]
-  target_tags   = ["db-server"]
-}
-
-# Private Services Access for Cloud SQL
+# Private Services Access — required for Cloud SQL private IP
 resource "google_compute_global_address" "private_ip" {
-  count         = var.enable_private_services_access ? 1 : 0
   name          = "${var.app_name}-private-ip"
   project       = var.project_id
   purpose       = "VPC_PEERING"
@@ -83,8 +52,7 @@ resource "google_compute_global_address" "private_ip" {
 }
 
 resource "google_service_networking_connection" "private_vpc" {
-  count                   = var.enable_private_services_access ? 1 : 0
   network                 = google_compute_network.vpc.id
   service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_ip[0].name]
+  reserved_peering_ranges = [google_compute_global_address.private_ip.name]
 }
