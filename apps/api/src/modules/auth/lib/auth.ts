@@ -1,7 +1,7 @@
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { openAPI } from "better-auth/plugins";
-import { appConfig, getValidateEnv } from "src/config/app.config";
+import { appConfig } from "src/config/app.config";
 import { db } from "src/db";
 import { redis } from "src/lib/redis";
 import { emailService } from "src/modules/emails/email.service";
@@ -67,7 +67,10 @@ export const auth = betterAuth({
     //   credentials: true,
     // },
   },
-  trustedOrigins: getValidateEnv().TRUSTED_DOMAINS,
+  trustedOrigins: (appConfig.TRUSTED_DOMAINS as unknown as string | undefined)
+    ?.split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
   experimental: {
     joins: true,
   },
